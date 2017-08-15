@@ -4,8 +4,8 @@
   "description": "TrendStar Softball Team Statistics",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "webpack-dev-server"
+    "build": "set NODE_ENV=production&& webpack",
+    "dev": "set NODE_ENV=development&& webpack-dev-server"
   },
   "keywords": [],
   "author": "Wilson Hsu",

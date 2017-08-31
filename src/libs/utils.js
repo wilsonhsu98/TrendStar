@@ -69,8 +69,8 @@ utils.genStatistics = function(players, records, filterPA) {
                 SF: sf > 0 ? sf : '-',
                 R: r > 0 ? r : '-',
                 RBI: rbi > 0 ? rbi : '-',
-                OBP: Math.round(tob / pa * 100) / 100,
-                OPS: Math.round(tob / pa * 100) / 100
+                OBP: Math.round(tob / pa * 1000) / 1000,
+                OPS: Math.round(tob / pa * 1000) / 1000
             });
         } else {
             obj = Object.assign(obj, {
@@ -89,10 +89,10 @@ utils.genStatistics = function(players, records, filterPA) {
                 BB: bb,
                 SF: sf,
                 DP: dp,
-                AVG: Math.round(h / ab * 100) / 100,
-                OBP: Math.round(tob / pa * 100) / 100,
-                SLG: Math.round(tb / ab * 100) / 100,
-                OPS: Math.round((tob / pa + tb / ab) * 100) / 100
+                AVG: Math.round(h / ab * 1000) / 1000,
+                OBP: Math.round(tob / pa * 1000) / 1000,
+                SLG: Math.round(tb / ab * 1000) / 1000,
+                OPS: Math.round((tob / pa + tb / ab) * 1000) / 1000
             });
         }
 

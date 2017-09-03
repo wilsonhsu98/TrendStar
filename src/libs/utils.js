@@ -1,7 +1,14 @@
 var utils = exports;
 
-utils.genStatistics = function(players, records, filterPA) {
+utils.genStatistics = function(players, records, filterPA, filterGames) {
     filterPA = filterPA || 10;
+    let sortRecords = JSON.parse(JSON.stringify(records));
+
+    sortRecords = sortRecords.sort((a, b) => {
+        return parseInt(b._table.match(/\d/g).join('') + (b.order + 10), 10) -
+            parseInt(a._table.match(/\d/g).join('') + (a.order + 10), 10)
+    });
+
     return players.map(function(name) {
         var pa = 0,
             ab = 0,
@@ -19,7 +26,10 @@ utils.genStatistics = function(players, records, filterPA) {
             sf = 0,
             dp = 0;
 
-        var top = records.filter(function(item) { return item.name === name }).slice(0, filterPA);
+        var top = sortRecords
+            .filter(function(item) { return filterGames === undefined || (Array.isArray(filterGames) && filterGames.length === 0) ? true : filterGames.indexOf(item._table) > -1; })
+            .filter(function(item) { return item.name === name })
+            .slice(0, filterPA);
         top.forEach(function(item) {
             pa += 1;
             ab += ['1H', '2H', '3H', 'HR', '飛球', '滾地', 'K', 'E', '野選', '雙殺'].indexOf(item.content) > -1 ? 1 : 0;
@@ -97,5 +107,53 @@ utils.genStatistics = function(players, records, filterPA) {
         }
 
         return obj;
+    });
+};
+
+utils.parseGame = function(arr) {
+    var row = 1,
+        col = 3,
+        order = 1,
+        result = [],
+        scan = [],
+        innArray = ['', '一', '二', '三', '四', '五', '六', '七'];
+    while (col < arr[0].length) {
+        if (scan.indexOf(row + '' + col) === -1) {
+            scan.push(row + '' + col);
+            if (arr[row][col]) {
+                var run = '';
+                if (arr[row][col + 2] === 'R') {
+                    run = arr[row][1];
+                } else if (row + 1 < arr.length && arr[row + 1][col] === '' && arr[row + 1][col + 2] === 'R') {
+                    run = arr[row + 1][1];
+                }
+                result.push({
+                    order: order++,
+                    inn: innArray.indexOf(arr[0][col]),
+                    name: arr[row][1],
+                    content: arr[row][col],
+                    r: run,
+                    rbi: arr[row][col + 1],
+                    _row: row
+                });
+            }
+        }
+        row++;
+        if (row === arr.length) {
+            if (scan.indexOf('1' + col) === -1) {
+                row = 1;
+            } else {
+                col += 3;
+                if (result[result.length - 1]._row === arr.length - 1) {
+                    row = 1;
+                } else {
+                    row = result[result.length - 1]._row + 1
+                }
+            }
+        }
+    }
+    return result.map(function(item) {
+        delete item._row;
+        return item;
     });
 };

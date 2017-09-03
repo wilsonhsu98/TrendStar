@@ -2,147 +2,62 @@
 	<div>
 		<div class="search-bar">
  			<div class="search-bar__container"><div class="search-icon"></div></div>
- 			<input type="checkbox" class="toggle-search"/>
+ 			<input type="checkbox" class="toggle-search" v-model="toggleSearch"/>
  			<div class="condition">
+				<div class="condition__label">Period:</div>
+				<div class="condition__element">
+					<select class="dropdown" v-model="periodSelect">
+						<option v-for="item in period">{{ item.period }}</option>
+					</select>
+				</div>
 				<div class="condition__label">Latest PA:</div>
 				<div class="condition__element">
-					 <div class="dec button" @click="minusPa"></div><!--
-					 --><input type="number" id="top_pa" v-model.number="inpNum" min="1"><!--
-					 --><div class="inc button" @click="addPa"></div>
+					 <minus-plus-number :value="top" v-on:change="setTop"/>
 				</div>
 				<div class="condition__label">Sort by:</div>
-				<div class="condition__element">
-					<select id="sort_by" v-model="sortBy">
+				<div class="condition__element sort">
+					<select class="dropdown" v-model="sortBy">
 						<option v-for="col in conditionCols()">{{ col }}</option>
 					</select>
 				</div>
 				<br>
 				<div class="condition__label col">Display:</div>
 				<div class="condition__element col">
-					<label class="condition__col" :for="col" v-for="col in conditionCols()"><!--
+					<label class="condition__col" for="check_all"><!--
+						 --><input id="check_all" type="checkbox" v-model="checkAll"/><!--
+						 -->All<!--
+					 --></label><!--
+					 --><label class="condition__col" :for="col" v-for="col in conditionCols()"><!--
 						 --><input :id="col" type="checkbox" :value="col" v-model="columnsDisplay" :disabled="col===sortBy"/><!--
 						 -->{{ col }}<!--
 					 --></label>
 				 </div>
 			</div>
 		</div>
-		<div id="table" v-if="list.length">
+		<div id="table" v-if="list.length" @click="collapseSearch($event)">
 			<div class="header-row">
-				<span class="cell" v-for="col in filterCols()">{{ col }}</span>
+				<span :class="`cell ${col}`" v-for="col in filterCols()">{{ col }}</span>
 			</div>
-			<div class="row" v-for="(item, index) in list">
+			<template v-for="(item, index) in list">
 				<input type="radio" name="expand" class="toggle-row" @click="toggleRadio($event)"/>
-				<span
-					:class="`cell ${col === sortBy ? 'sort' : ''} ${['Rank', 'name'].indexOf(col) > -1 ? col : ''}`"
-					v-for="(col, cIndex) in filterCols()"
-					:data-label="col">
-					{{ cIndex === 0 ? (index + 1) : formatValue(item[col], col) }}
-				</span>
-			</div>
+				<div class="row-grid">
+					<span
+						:class="`cell ${col === sortBy ? 'sort' : ''} ${['Rank', 'name'].indexOf(col) > -1 ? col : ''}`"
+						v-for="(col, cIndex) in filterCols()"
+						:data-label="col">
+						{{ cIndex === 0 ? (index + 1) : formatValue(item[col], col) }}
+					</span>
+				</div>
+			</template>
 		</div>
-		<div v-if="loading" class="loading-mask">
-			<div class="sk-cube-grid">
-				<div class="sk-cube sk-cube1"></div>
-				<div class="sk-cube sk-cube2"></div>
-				<div class="sk-cube sk-cube3"></div>
-				<div class="sk-cube sk-cube4"></div>
-				<div class="sk-cube sk-cube5"></div>
-				<div class="sk-cube sk-cube6"></div>
-				<div class="sk-cube sk-cube7"></div>
-				<div class="sk-cube sk-cube8"></div>
-				<div class="sk-cube sk-cube9"></div>
-			</div>
-		</div>
+		<loading v-if="loading"></loading>
 	</div>
 </template>
 
 <style lang="scss">
-	$table_bordercolor: #327a81;
-	$header_bgcolor: rgba(50, 122, 129, 0.9);
-	$header_color: #FFF;
-	$row_odd_bgcolor: #edf7f8;
-	$row_even_bgcolor: #FFF;
-	$row_color: #2b686e;
-	$magnifier_size: 20px;
-.loading-mask {
-	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	background-color: rgba(50, 122, 129, 0.1);
-}
-.sk-cube-grid {
-	width: 40px;
-	height: 40px;
-	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	margin:auto;
-}
+	@import "../scss/variable";
+	@import "../scss/base";
 
-.sk-cube-grid .sk-cube {
-	width: 33%;
-	height: 33%;
-	background-color: $header_bgcolor;
-	float: left;
-	-webkit-animation: sk-cubeGridScaleDelay 1.3s infinite ease-in-out;
-			animation: sk-cubeGridScaleDelay 1.3s infinite ease-in-out;
-}
-.sk-cube-grid .sk-cube1 {
-  -webkit-animation-delay: 0.2s;
-          animation-delay: 0.2s; }
-.sk-cube-grid .sk-cube2 {
-  -webkit-animation-delay: 0.3s;
-          animation-delay: 0.3s; }
-.sk-cube-grid .sk-cube3 {
-  -webkit-animation-delay: 0.4s;
-          animation-delay: 0.4s; }
-.sk-cube-grid .sk-cube4 {
-  -webkit-animation-delay: 0.1s;
-          animation-delay: 0.1s; }
-.sk-cube-grid .sk-cube5 {
-  -webkit-animation-delay: 0.2s;
-          animation-delay: 0.2s; }
-.sk-cube-grid .sk-cube6 {
-  -webkit-animation-delay: 0.3s;
-          animation-delay: 0.3s; }
-.sk-cube-grid .sk-cube7 {
-  -webkit-animation-delay: 0s;
-          animation-delay: 0s; }
-.sk-cube-grid .sk-cube8 {
-  -webkit-animation-delay: 0.1s;
-          animation-delay: 0.1s; }
-.sk-cube-grid .sk-cube9 {
-  -webkit-animation-delay: 0.2s;
-          animation-delay: 0.2s; }
-
-@-webkit-keyframes sk-cubeGridScaleDelay {
-  0%, 70%, 100% {
-    -webkit-transform: scale3D(1, 1, 1);
-            transform: scale3D(1, 1, 1);
-  } 35% {
-    -webkit-transform: scale3D(0, 0, 1);
-            transform: scale3D(0, 0, 1);
-  }
-}
-
-@keyframes sk-cubeGridScaleDelay {
-  0%, 70%, 100% {
-    -webkit-transform: scale3D(1, 1, 1);
-            transform: scale3D(1, 1, 1);
-  } 35% {
-    -webkit-transform: scale3D(0, 0, 1);
-            transform: scale3D(0, 0, 1);
-  }
-}
-	body {
-		margin: 0;
-		font-family: 'Inconsolata';
-		padding: 10px;
-	}
 	.condition {
 		> div, label {
 			display: inline-block;
@@ -151,7 +66,7 @@
 			vertical-align: middle;
 		}
 		&__label {
-			padding: 4px;
+			padding: 0 4px;
 			text-align: left;
 			&.col {
 				vertical-align: top;
@@ -168,67 +83,8 @@
 			vertical-align: middle;
 		}
 	}
-	#top_pa {
-		width: 40px;
-		padding: 3px 0 0 0;
-		text-align: center;
-		vertical-align: top;
-		height: 30px;
-		box-sizing: border-box;
-		border: 2px solid rgb(166, 166, 166);
-		background-color: rgb(248, 248, 248);
-		vertical-align: middle;
-	}
-	.button {
-		position: relative;
-		width: 22px;
-		height: 22px;
-	    display: inline-block;
-		border: 4px solid black;
-		vertical-align: middle;
-		&:before, &:after {
-		    content: "";
-			position: absolute;
-			background-color: white;
-		}
-		&.inc {
-			border-radius: 0 5px 5px 0;
-			border-color: #5cb85c;
-			background-color: #5cb85c;
-			&:before {
-				top: 6px;
-				left: 50%;
-				width: 4px;
-				height: calc(100% - 12px);
-				margin-left: -2px;
-			}
-			&:after {
-				top: 50%;
-				left: 6px;
-				width: calc(100% - 12px);
-				height: 4px;
-				margin-top: -2px;
-			}
-		}
-		&.dec {
-			border-radius: 5px 0 0 5px;
-			border-color: #d9534f;
-			background-color: #d9534f;
-			&:after {
-				top: 50%;
-				left: 6px;
-				width: calc(100% - 12px);
-				height: 4px;
-				margin-top: -2px;
-			}
-		}
-	}
-	input[type=number]::-webkit-inner-spin-button,
-	input[type=number]::-webkit-outer-spin-button {
-		-webkit-appearance: none;
-		margin: 0; /* Removes leftover margin */
-	}
-	#sort_by {
+
+	.dropdown {
 		height: 30px;
 		width: 100px;
 		border: 2px solid rgb(166, 166, 166);
@@ -242,21 +98,26 @@
 		box-sizing: border-box;
 		color: $row_color;
 		border: 1px solid $table_bordercolor;
+		overflow: hidden;
 		.header-row {
 			display: table-row;
 			background: $header_bgcolor;
 			color: $header_color;
+			.cell {
+				&.Rank { width: 50px; }
+				&.name { width: 70px; }
+				// &.AVG, &.OBP, &.SLG, &.OPS { width: 60px; }
+			}
 		}
-		.row {
+		.row-grid {
 			display: table-row;
-			&:nth-child(even) { background-color: $row_even_bgcolor; }
-			&:nth-child(odd) { background-color: $row_odd_bgcolor; }
+			&:nth-child(4n+3) { background-color: $row_even_bgcolor; }
+			&:nth-child(4n+1) { background-color: $row_odd_bgcolor; }
 		}
 		.cell {
 			display: table-cell;
 			line-height: 30px;
 			text-align: center;
-
 		}
 	}
 	.toggle-row,
@@ -265,9 +126,6 @@
 		display: none;
 	}
 	@media only screen and (max-width: 760px) {
-		body {
-			padding: 0;
-		}
 		.search-bar {
 			background-color: $header_bgcolor;
 			position: fixed;
@@ -300,12 +158,12 @@
 				}
 			}
 			.condition {
-				max-height: 0px;
+				max-height: 0;
 				transition: max-height .8s cubic-bezier(0, 1, 0, 1) -.1s;
 				display: grid;
 				grid-template-rows: auto;
 				grid-column-gap: 3px;
-				grid-row-gap: 3px;
+				grid-row-gap: 6px;
 				align-items: center;
 				justify-items: start;
 				padding: 0 3px;
@@ -349,24 +207,30 @@
 			display: block;
 			border: none;
 			margin-top: 40px;
-			.row {
+			position: relative;
+			z-index: 0;
+
+			.row-grid {
 				position: relative;
 				display: grid;
 				grid-template-rows: auto;
 				z-index: 0;
-				&:nth-child(even) {
-					background-color: #fff;
-					.cell {
-						&.Rank, &.name, &.sort {
-							background-color: $row_even_bgcolor;
-						}
-					}
-				}
-				&:nth-child(odd) {
-					background-color: #fff;
+				background-color: #FFF;
+				transition: max-height 0.8s cubic-bezier(0, 1, 0, 1) -.1s;
+				max-height: 30px;
+				&:nth-child(4n+1) {
+					background-color: #FFF;
 					.cell {
 						&.Rank, &.name, &.sort {
 							background-color: $row_odd_bgcolor;
+						}
+					}
+				}
+				&:nth-child(4n+3) {
+					background-color: #FFF;
+					.cell {
+						&.Rank, &.name, &.sort {
+							background-color: $row_even_bgcolor;
 						}
 					}
 				}
@@ -378,7 +242,9 @@
 				display: block;
 				box-sizing: border-box;
 				&:not(.sort):not(.Rank):not(.name) {
-					display: none;
+					grid-column: auto / span 2;
+					text-align: left;
+
 				}
 				&:not(.Rank):not(.name) {
 					&:before {
@@ -408,10 +274,10 @@
 				margin: 0;
 				opacity: 0;
 				&:checked {
-					&~.cell:not(.sort):not(.Rank):not(.name) {
-						display: block;
-						grid-column: auto / span 2;
-						text-align: left;
+					&+.row-grid {
+						max-height: 9999px;
+						transition-timing-function: cubic-bezier(0.5, 0, 1, 0);
+						transition-delay: 0s;
 					}
 				}
 			}
@@ -419,7 +285,7 @@
 	}
 	@media only screen and (max-width: 760px) and (orientation: portrait) {
 		#table {
-			.row {
+			.row-grid {
 				grid-template-columns: repeat(6, 1fr);
 				grid-template-areas: "rank name name sort sort sort";
 			}
@@ -451,7 +317,7 @@
 	}
 	@media only screen and (max-width: 760px) and (orientation: landscape) {
 		#table {
-			.row {
+			.row-grid {
 				grid-template-columns: repeat(10, 1fr);
 				grid-template-areas: "rank name name sort sort sort sort sort sort sort";
 			}
@@ -467,6 +333,9 @@
 			}
 			&__element {
 				grid-column: auto / span 3;
+				&.sort {
+					grid-column: auto / span 8;
+				}
 				&.col {
 					grid-column: auto / span 8;
 					height: auto;
@@ -486,16 +355,22 @@
 
 <script>
 	import utils from "../libs/utils";
-	import { QUERY_SHEET_URL } from "../constants/index";
+	import { GET_URL } from "../constants/index";
 
 	export default {
 		data() {
 			return {
+				period: [{period: 'All time'}],
+				periodSelect: localStorage.getItem("pref_period") || 'All time',
+				periodSelectValues: [],
+				periodLoaded: [],
+				allGames: [],
 				list: [],
 				players: [],
 				records: [],
-				top: 10,
-				sortBy: 'OPS',
+				toggleSearch: false,
+				top: parseInt(localStorage.getItem("pref_top"), 10) || 10,
+				sortBy: localStorage.getItem("pref_sortby") || 'OPS',
 				cols: [
 					{Rank: true},
 					{name: true},
@@ -524,11 +399,7 @@
 			};
 		},
 		mounted() {
-			const pref_top = localStorage.getItem("pref_top");
-			const pref_sortby = localStorage.getItem("pref_sortby");
 			const pref_cols = localStorage.getItem("pref_cols");
-			if (pref_top) this.top = parseInt(pref_top, 10);
-			if (pref_sortby) this.sortBy = pref_sortby;
 			if (pref_cols) this.cols = JSON.parse(pref_cols);
 
 			this.fetch();
@@ -536,31 +407,45 @@
 		methods: {
 			fetch() {
 				this.loading = true;
-				fetch(QUERY_SHEET_URL.replace(/\$\{sheetname\}/, 'game') + new Date().toString())
+				fetch(GET_URL({sheetname: 'game'}))
 					.then(res => {
 						if (res.status >= 400) throw new Error("Bad response from server");
 						return res.json();
 					})
 					.then(arr => {
-						var tableArr = JSON.stringify(
-							arr
-							// .filter(function(item) { return ['20170812-1', '20170812-2'].indexOf(item.game) > -1; })
-							.sort(function(a, b) { return a.game.replace(/[^\d]/g, '') > b.game.replace(/[^\d]/g, ''); })
-							.map(function(item) { return item.game; })
+						this.allGames = arr.map(item => item.game);
+						this.period = [{period: 'All time', games: this.allGames}].concat(
+							arr.map(item => item.year + item.season)
+								.filter((value, index, self) => self.indexOf(value) === index)
+								.map(item => ({period: item, games: arr.filter(sub => (sub.year + sub.season) === item ).map(sub => sub.game)}))
+								.sort((a, b)=> a.period < b.period)
 						);
+						let games = this.period.find(item => item.period === this.periodSelect);
+						games = games ? games.games : [];
+
+						const tableArr = JSON.stringify(
+							this.allGames.filter(function(item) { return games.indexOf(item) > -1; })
+						);
+
 						return Promise.all([
-							QUERY_SHEET_URL.replace(/\$\{sheetname\}/, 'player') + new Date().toString(),
-							QUERY_SHEET_URL.replace(/\$\{sheetname\}/, tableArr) + new Date().toString()
-						].map(url => fetch(url))).then(responses => Promise.all(responses.map(res => res.json())));
+							GET_URL({sheetname: 'player'}),
+							GET_URL({sheetname: tableArr})
+						].map(url => fetch(url)
+							.then(res => {
+								if (res.status >= 400) throw new Error("Bad response from server");
+								return res.json();
+							})
+						));
 					}).then(arr => {
 						this.players = arr[0].map(item => item.player);
-						arr[1].reverse();
 						this.records = arr[1];
+						this.periodLoaded.push(this.periodSelect);
+						this.loading = false;
+					}).catch(err => {
+						alert(err);
 						this.loading = false;
 					});
 			},
-			addPa() { this.top += 1; },
-			minusPa() { this.top -= this.top > 1 ? 1 : 0; },
 			conditionCols() {
 				return this.cols.map(item => Object.keys(item)[0]).filter(i => i !== 'Rank' && i!= 'name');
 			},
@@ -579,17 +464,39 @@
 				} else {
 					this.toggleTarget = event.target;
 				}
+			},
+			collapseSearch(event) {
+				if (this.toggleSearch) {
+					this.toggleSearch = false;
+				}
+			},
+			setTop(val) {
+				this.top = val;
+			},
+			secondFetch() {
+				const tableArr = JSON.stringify(this.periodSelectValues);
+				this.loading = true;
+				fetch(GET_URL({sheetname: tableArr}))
+					.then(res => {
+						if (res.status >= 400) throw new Error("Bad response from server");
+						return res.json();
+					})
+					.then(res => {
+						if (this.periodSelect === 'All time') {
+							this.records = res;
+						} else {
+							this.records = this.records.concat(res);
+						}
+						this.periodLoaded.push(this.periodSelect);
+						this.loading = false;
+					})
+					.catch(err => {
+						alert(err);
+						this.loading = false;
+					});
 			}
 		},
 		computed: {
-			inpNum: {
-				get: function() {
-					return this.top;
-				},
-				set: function(newValue) {
-					this.top = newValue || 1;
-				}
-			},
 			columnsDisplay: {
 				get: function() {
 					return this.filterCols();
@@ -602,20 +509,57 @@
 
 					localStorage.setItem("pref_cols", JSON.stringify(this.cols));
 				}
+			},
+			checkAll: {
+				get: function() {
+					return this.filterCols().length === this.cols.length;
+				},
+				set: function(newValue) {
+					this.cols
+					.filter(item => ['Rank', 'name'].indexOf(Object.keys(item)[0]) === -1)
+					.forEach(item => {
+						item[Object.keys(item)[0]] = newValue;
+						if (Object.keys(item)[0] === this.sortBy) {
+							item[Object.keys(item)[0]] = true;
+						}
+					});
+
+					localStorage.setItem("pref_cols", JSON.stringify(this.cols));
+				}
 			}
 		},
 		watch: {
 			top(top) {
 				localStorage.setItem("pref_top", top);
 
-				this.list = utils.genStatistics(this.players, this.records, top)
+				this.list = utils.genStatistics(this.players, this.records, top, this.periodSelectValues)
 					.filter(item => item.PA !== '-')
 					.sort((a, b) => b[this.sortBy] - a[this.sortBy]);
 			},
 			records(records) {
-				this.list = utils.genStatistics(this.players, records, this.top)
+				this.list = utils.genStatistics(this.players, records, this.top, this.periodSelectValues)
 					.filter(item => item.PA !== '-')
 					.sort((a, b) => b[this.sortBy] - a[this.sortBy]);
+			},
+			periodSelect(periodSelect) {
+				localStorage.setItem("pref_period", periodSelect);
+				this.periodSelectValues = this.period.find(item => item.period === periodSelect);
+				this.periodSelectValues = this.periodSelectValues ? this.periodSelectValues.games : [];
+				const loadedTables = this.period
+					.filter(item => this.periodLoaded.indexOf(item.period) > -1 )
+					.map(item => item.games)
+					.reduce(function(a, b) { return a.concat(b); }, []);
+				if (
+					this.periodLoaded.indexOf('All time') > -1 ||
+					this.periodLoaded.indexOf(periodSelect) > -1 ||
+					loadedTables.length === this.allGames.length
+				) {
+					this.list = utils.genStatistics(this.players, this.records, this.top, this.periodSelectValues)
+						.filter(item => item.PA !== '-')
+						.sort((a, b) => b[this.sortBy] - a[this.sortBy]);
+				} else {
+					this.secondFetch();
+				}
 			},
 			sortBy(sortBy) {
 				this.cols.forEach(item => {
@@ -627,7 +571,7 @@
 				localStorage.setItem("pref_cols", JSON.stringify(this.cols));
 				localStorage.setItem("pref_sortby", sortBy);
 
-				this.list = utils.genStatistics(this.players, this.records, this.top)
+				this.list = utils.genStatistics(this.players, this.records, this.top, this.periodSelectValues)
 					.filter(item => item.PA !== '-')
 					.sort((a, b) => b[sortBy] - a[sortBy]);
 			}

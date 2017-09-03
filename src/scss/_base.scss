@@ -1,0 +1,17 @@
+body {
+	margin: 0;
+	font-family: 'Inconsolata';
+	padding: 10px;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+	margin: 0; /* Removes leftover margin */
+}
+
+@media only screen and (max-width: 760px) {
+	body {
+		padding: 0;
+	}
+}

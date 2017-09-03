@@ -3,7 +3,7 @@
 		<div class="search-bar">
  			<div class="search-bar__container"><div class="search-icon"></div></div>
  			<input type="checkbox" class="toggle-search" v-model="toggleSearch"/>
- 			<div class="condition">
+ 			<div class="condition" ref="condition">
 				<div class="condition__label">Period:</div>
 				<div class="condition__element">
 					<select class="dropdown" v-model="periodSelect">
@@ -34,7 +34,7 @@
 				 </div>
 			</div>
 		</div>
-		<div id="table" v-if="list.length" @click="collapseSearch($event)">
+		<div id="table" v-if="list.length">
 			<div class="header-row">
 				<span :class="`cell ${col}`" v-for="col in filterCols()">{{ col }}</span>
 			</div>
@@ -403,6 +403,11 @@
 			if (pref_cols) this.cols = JSON.parse(pref_cols);
 
 			this.fetch();
+
+			window.addEventListener('click', this.collapseSearch);
+		},
+		beforeDestroy() {
+			window.removeEventListener('click', this.collapseSearch);
 		},
 		methods: {
 			fetch() {
@@ -466,7 +471,7 @@
 				}
 			},
 			collapseSearch(event) {
-				if (this.toggleSearch) {
+				if (this.toggleSearch && !this.$refs["condition"].contains(event.target)) {
 					this.toggleSearch = false;
 				}
 			},

@@ -60,7 +60,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "86d6e07a82ad76ec5ed8"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "aeead7b8f4c615d9b192"; // eslint-disable-line no-unused-vars
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
@@ -16109,6 +16109,11 @@ exports.default = {
 		if (pref_cols) this.cols = JSON.parse(pref_cols);
 
 		this.fetch();
+
+		window.addEventListener('click', this.collapseSearch);
+	},
+	beforeDestroy: function beforeDestroy() {
+		window.removeEventListener('click', this.collapseSearch);
 	},
 
 	methods: {
@@ -16199,7 +16204,7 @@ exports.default = {
 			}
 		},
 		collapseSearch: function collapseSearch(event) {
-			if (this.toggleSearch) {
+			if (this.toggleSearch && !this.$refs["condition"].contains(event.target)) {
 				this.toggleSearch = false;
 			}
 		},
@@ -17442,6 +17447,7 @@ var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._sel
       }
     }
   }), _vm._v(" "), _c('div', {
+    ref: "condition",
     staticClass: "condition"
   }, [_c('div', {
     staticClass: "condition__label"
@@ -17589,11 +17595,6 @@ var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._sel
   })], 2)])]), _vm._v(" "), (_vm.list.length) ? _c('div', {
     attrs: {
       "id": "table"
-    },
-    on: {
-      "click": function($event) {
-        _vm.collapseSearch($event)
-      }
     }
   }, [_c('div', {
     staticClass: "header-row"

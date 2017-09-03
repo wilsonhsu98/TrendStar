@@ -404,10 +404,10 @@
 
 			this.fetch();
 
-			window.addEventListener('click', this.collapseSearch);
+			// window.addEventListener('click', this.collapseSearch);
 		},
 		beforeDestroy() {
-			window.removeEventListener('click', this.collapseSearch);
+			// window.removeEventListener('click', this.collapseSearch);
 		},
 		methods: {
 			fetch() {
@@ -471,6 +471,7 @@
 				}
 			},
 			collapseSearch(event) {
+				// console.log(event);
 				if (this.toggleSearch && !this.$refs["condition"].contains(event.target)) {
 					this.toggleSearch = false;
 				}

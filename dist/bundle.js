@@ -60,7 +60,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "d722c1901028557d6318"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "aeead7b8f4c615d9b192"; // eslint-disable-line no-unused-vars
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
@@ -16110,10 +16110,10 @@ exports.default = {
 
 		this.fetch();
 
-		// window.addEventListener('click', this.collapseSearch);
+		window.addEventListener('click', this.collapseSearch);
 	},
 	beforeDestroy: function beforeDestroy() {
-		// window.removeEventListener('click', this.collapseSearch);
+		window.removeEventListener('click', this.collapseSearch);
 	},
 
 	methods: {
@@ -16204,7 +16204,6 @@ exports.default = {
 			}
 		},
 		collapseSearch: function collapseSearch(event) {
-			// console.log(event);
 			if (this.toggleSearch && !this.$refs["condition"].contains(event.target)) {
 				this.toggleSearch = false;
 			}

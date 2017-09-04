@@ -404,7 +404,7 @@
 
 			this.fetch();
 
-			window.addEventListener('click', this.collapseSearch);
+			window.addEventListener('click', this.collapseSearch, true);
 		},
 		beforeDestroy() {
 			window.removeEventListener('click', this.collapseSearch);

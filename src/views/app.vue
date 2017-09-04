@@ -42,7 +42,7 @@
 				<input type="radio" name="expand" class="toggle-row" @click="toggleRadio($event)"/>
 				<div class="row-grid">
 					<span
-						:class="`cell ${col === sortBy ? 'sort' : ''} ${['Rank', 'name'].indexOf(col) > -1 ? col : ''}`"
+						:class="`cell${col === sortBy ? ' sort' : ''}${['Rank', 'name'].indexOf(col) > -1 ? ' ' + col : ''}`"
 						v-for="(col, cIndex) in filterCols()"
 						:data-label="col">
 						{{ cIndex === 0 ? (index + 1) : formatValue(item[col], col) }}
@@ -530,6 +530,16 @@
 					});
 
 					localStorage.setItem("pref_cols", JSON.stringify(this.cols));
+
+					if (newValue) {
+						setTimeout(function() {
+							var x = document.getElementsByClassName('cell');
+							for (var i = 0, len = x.length; i < len; i++) {
+								x[i].style.display = 'block';
+								x[i].style.display = '';
+							}
+						});
+					}
 				}
 			}
 		},

@@ -60,7 +60,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "c9b16779c5ef80e26f0a"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "bbe8379ee37efb51ce10"; // eslint-disable-line no-unused-vars
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
@@ -16264,6 +16264,16 @@ exports.default = {
 				});
 
 				localStorage.setItem("pref_cols", (0, _stringify2.default)(this.cols));
+
+				if (newValue) {
+					setTimeout(function () {
+						var x = document.getElementsByClassName('cell');
+						for (var i = 0, len = x.length; i < len; i++) {
+							x[i].style.display = 'block';
+							x[i].style.display = '';
+						}
+					});
+				}
 			}
 		}
 	},
@@ -17618,7 +17628,7 @@ var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._sel
       staticClass: "row-grid"
     }, _vm._l((_vm.filterCols()), function(col, cIndex) {
       return _c('span', {
-        class: ("cell " + (col === _vm.sortBy ? 'sort' : '') + " " + (['Rank', 'name'].indexOf(col) > -1 ? col : '')),
+        class: ("cell" + (col === _vm.sortBy ? ' sort' : '') + (['Rank', 'name'].indexOf(col) > -1 ? ' ' + col : '')),
         attrs: {
           "data-label": col
         }

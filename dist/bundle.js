@@ -60,7 +60,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "bbe8379ee37efb51ce10"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "007b22d9a30ee66cc067"; // eslint-disable-line no-unused-vars
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
@@ -16204,8 +16204,9 @@ exports.default = {
 			}
 		},
 		collapseSearch: function collapseSearch(event) {
-			if (this.toggleSearch && !this.$refs["condition"].contains(event.target)) {
+			if (this.toggleSearch && !this.$refs["searchBar"].contains(event.target)) {
 				this.toggleSearch = false;
+				event.preventDefault();
 			}
 		},
 		setTop: function setTop(val) {
@@ -17423,6 +17424,7 @@ exports.f = {}.propertyIsEnumerable;
 "use strict";
 var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
   return _c('div', [_c('div', {
+    ref: "searchBar",
     staticClass: "search-bar"
   }, [_vm._m(0), _vm._v(" "), _c('input', {
     directives: [{
@@ -17457,7 +17459,6 @@ var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._sel
       }
     }
   }), _vm._v(" "), _c('div', {
-    ref: "condition",
     staticClass: "condition"
   }, [_c('div', {
     staticClass: "condition__label"

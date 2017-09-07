@@ -1,9 +1,9 @@
 <template>
 	<div>
-		<div class="search-bar">
+		<div class="search-bar" ref="searchBar">
  			<div class="search-bar__container"><div class="search-icon"></div></div>
  			<input type="checkbox" class="toggle-search" v-model="toggleSearch"/>
- 			<div class="condition" ref="condition">
+ 			<div class="condition">
 				<div class="condition__label">Period:</div>
 				<div class="condition__element">
 					<select class="dropdown" v-model="periodSelect">
@@ -471,8 +471,9 @@
 				}
 			},
 			collapseSearch(event) {
-				if (this.toggleSearch && !this.$refs["condition"].contains(event.target)) {
+				if (this.toggleSearch && !this.$refs["searchBar"].contains(event.target)) {
 					this.toggleSearch = false;
+					event.preventDefault();
 				}
 			},
 			setTop(val) {

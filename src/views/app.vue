@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<div class="search-bar" ref="searchBar">
- 			<div class="search-bar__container"><div class="search-icon"></div></div>
+ 			<div class="search-bar__container"><i class="icono-search"></i></div>
  			<input type="checkbox" class="toggle-search" v-model="toggleSearch"/>
  			<div class="condition">
 				<div class="condition__label">Period:</div>
@@ -32,15 +32,18 @@
 						 -->{{ col }}<!--
 					 --></label>
 				 </div>
+				 <i class="icono-reset" @click="refreshPlayer()"></i>
 			</div>
 		</div>
-		<div id="table" v-if="list.length">
+		<div id="table">
 			<div class="header-row">
+				<span class="cell delete"><i class="icono-reset" @click="refreshPlayer()"></i></span>
 				<span :class="`cell ${col}`" v-for="col in filterCols()">{{ col }}</span>
 			</div>
 			<template v-for="(item, index) in list">
 				<input type="radio" name="expand" class="toggle-row" @click="toggleRadio($event)"/>
 				<div class="row-grid">
+					<span class="cell delete"><i class="icono-trash" @click="deletePlayer(item.name)"></i></span>
 					<span
 						:class="`cell${col === sortBy ? ' sort' : ''}${['Rank', 'name'].indexOf(col) > -1 ? ' ' + col : ''}`"
 						v-for="(col, cIndex) in filterCols()"
@@ -104,7 +107,7 @@
 			background: $header_bgcolor;
 			color: $header_color;
 			.cell {
-				&.Rank { width: 50px; }
+				&.Rank, &.delete { width: 50px; }
 				&.name { width: 70px; }
 				// &.AVG, &.OBP, &.SLG, &.OPS { width: 60px; }
 			}
@@ -116,12 +119,13 @@
 		}
 		.cell {
 			display: table-cell;
-			line-height: 30px;
+			line-height: 36px;
 			text-align: center;
 		}
 	}
+	.search-bar__container,
+	.condition .icono-reset,
 	.toggle-row,
-	.search-icon,
 	.toggle-search {
 		display: none;
 	}
@@ -137,6 +141,7 @@
 			color: $header_color;
 			text-align: center;
 			&__container {
+				display: block;
 				height: 40px;
 				line-height: 40px;
 			}
@@ -168,39 +173,20 @@
 				justify-items: start;
 				padding: 0 3px;
 				box-sizing: border-box;
+				position: relative;
+				overflow: hidden;
 				> br {
 					display: none;
 				}
 				&__col {
 					margin: 0;
 				}
-			}
-		}
-		.search-icon {
-			position: relative;
-			display: inline-block;
-			width: $magnifier_size*1.4;
-			height: $magnifier_size*1.4;
-			text-align: left;
-			vertical-align: middle;
-			&:before {
-				content: '';
-				display: inline-block;
-				height: $magnifier_size;
-				width: $magnifier_size;
-				border-radius: 50%;
-				border: $magnifier_size/8 solid $header_color;
-			}
-			&:after {
-				content: '';
-				position: absolute;
-				top: $magnifier_size/2 + $magnifier_size/4*1.414 + $magnifier_size/4;
-				left: $magnifier_size/2 + $magnifier_size/4*1.414 + $magnifier_size/14;
-				transform: rotate(45deg);
-				height: $magnifier_size/8;
-				width: $magnifier_size/2;
-				background-color: $header_color;
-				border-radius: 10px;
+				.icono-reset {
+					display: inline-block;
+					position: absolute;
+					bottom: 5px;
+					left: 5px;
+				}
 			}
 		}
 		#table {
@@ -217,11 +203,11 @@
 				z-index: 0;
 				background-color: #FFF;
 				transition: max-height 0.8s cubic-bezier(0, 1, 0, 1) -.1s;
-				max-height: 30px;
+				max-height: 36px;
 				&:nth-child(4n+1) {
 					background-color: #FFF;
 					.cell {
-						&.Rank, &.name, &.sort {
+						&.Rank, &.name, &.sort, &.delete {
 							background-color: $row_odd_bgcolor;
 						}
 					}
@@ -229,7 +215,7 @@
 				&:nth-child(4n+3) {
 					background-color: #FFF;
 					.cell {
-						&.Rank, &.name, &.sort {
+						&.Rank, &.name, &.sort, &.delete {
 							background-color: $row_even_bgcolor;
 						}
 					}
@@ -241,12 +227,11 @@
 			.cell {
 				display: block;
 				box-sizing: border-box;
-				&:not(.sort):not(.Rank):not(.name) {
+				&:not(.sort):not(.Rank):not(.name):not(.delete) {
 					grid-column: auto / span 2;
 					text-align: left;
-
 				}
-				&:not(.Rank):not(.name) {
+				&:not(.Rank):not(.name):not(.delete) {
 					&:before {
 						content: attr(data-label) ":";
 						display: inline-block;
@@ -264,13 +249,16 @@
 					grid-area: sort;
 					text-align: center;
 				}
+				&.delete {
+					grid-area: delete;
+				}
 			}
 			.toggle-row {
 				display: block;
 				position: absolute;
 				z-index: 1;
-				height: 30px;
-				width: 100%;
+				height: 36px;
+				// width: 100%;
 				margin: 0;
 				opacity: 0;
 				&:checked {
@@ -287,7 +275,10 @@
 		#table {
 			.row-grid {
 				grid-template-columns: repeat(6, 1fr);
-				grid-template-areas: "rank name name sort sort sort";
+				grid-template-areas: "rank name name sort sort delete";
+			}
+			.toggle-row {
+				width: calc(100% / 6 * 5);
 			}
 		}
 		.condition {
@@ -319,7 +310,10 @@
 		#table {
 			.row-grid {
 				grid-template-columns: repeat(10, 1fr);
-				grid-template-areas: "rank name name sort sort sort sort sort sort sort";
+				grid-template-areas: "rank name name sort sort sort sort sort sort delete";
+			}
+			.toggle-row {
+				width: calc(100% / 10 * 9);
 			}
 		}
 		.condition {
@@ -371,6 +365,7 @@
 				toggleSearch: false,
 				top: parseInt(localStorage.getItem("pref_top"), 10) || 10,
 				sortBy: localStorage.getItem("pref_sortby") || 'OPS',
+				hiddenPlayer: [],
 				cols: [
 					{Rank: true},
 					{name: true},
@@ -401,6 +396,8 @@
 		mounted() {
 			const pref_cols = localStorage.getItem("pref_cols");
 			if (pref_cols) this.cols = JSON.parse(pref_cols);
+			const pref_hiddenplayer = localStorage.getItem("pref_hiddenplayer");
+			if (pref_hiddenplayer) this.hiddenPlayer = JSON.parse(pref_hiddenplayer);
 
 			this.fetch();
 
@@ -474,6 +471,9 @@
 				if (this.toggleSearch && !this.$refs["searchBar"].contains(event.target)) {
 					this.toggleSearch = false;
 					event.preventDefault();
+					if (event.target.classList.contains('icono-trash')) {
+						event.stopPropagation();
+					}
 				}
 			},
 			setTop(val) {
@@ -500,6 +500,21 @@
 						alert(err);
 						this.loading = false;
 					});
+			},
+			genStatistics() {
+				return utils.genStatistics(this.players, this.records, this.top, this.periodSelectValues)
+					.filter(item => item.PA !== '-' && item.PA >= this.top * 2 / 3 && this.hiddenPlayer.indexOf(item.name) === -1)
+					.sort((a, b) => b[this.sortBy] - a[this.sortBy]);
+			},
+			deletePlayer(player) {
+				this.hiddenPlayer.push(player);
+				localStorage.setItem("pref_hiddenplayer", JSON.stringify(this.hiddenPlayer));
+				this.list = this.genStatistics();
+			},
+			refreshPlayer() {
+				this.hiddenPlayer = [];
+				localStorage.setItem("pref_hiddenplayer", JSON.stringify(this.hiddenPlayer));
+				this.list = this.genStatistics();
 			}
 		},
 		computed: {
@@ -547,15 +562,12 @@
 		watch: {
 			top(top) {
 				localStorage.setItem("pref_top", top);
-
-				this.list = utils.genStatistics(this.players, this.records, top, this.periodSelectValues)
-					.filter(item => item.PA !== '-')
-					.sort((a, b) => b[this.sortBy] - a[this.sortBy]);
+				this.top = top;
+				this.list = this.genStatistics();
 			},
 			records(records) {
-				this.list = utils.genStatistics(this.players, records, this.top, this.periodSelectValues)
-					.filter(item => item.PA !== '-')
-					.sort((a, b) => b[this.sortBy] - a[this.sortBy]);
+				this.records = records;
+				this.list = this.genStatistics();
 			},
 			periodSelect(periodSelect) {
 				localStorage.setItem("pref_period", periodSelect);
@@ -570,9 +582,7 @@
 					this.periodLoaded.indexOf(periodSelect) > -1 ||
 					loadedTables.length === this.allGames.length
 				) {
-					this.list = utils.genStatistics(this.players, this.records, this.top, this.periodSelectValues)
-						.filter(item => item.PA !== '-')
-						.sort((a, b) => b[this.sortBy] - a[this.sortBy]);
+					this.list = this.genStatistics();
 				} else {
 					this.secondFetch();
 				}
@@ -586,10 +596,8 @@
 
 				localStorage.setItem("pref_cols", JSON.stringify(this.cols));
 				localStorage.setItem("pref_sortby", sortBy);
-
-				this.list = utils.genStatistics(this.players, this.records, this.top, this.periodSelectValues)
-					.filter(item => item.PA !== '-')
-					.sort((a, b) => b[sortBy] - a[sortBy]);
+				this.sortBy = sortBy;
+				this.list = this.genStatistics();
 			}
 		}
 	}

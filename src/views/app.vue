@@ -92,6 +92,7 @@
 		width: 100px;
 		border: 2px solid rgb(166, 166, 166);
 		background-color: rgb(248, 248, 248);
+		border-radius: 5px;
 	}
 	#table {
 		display: table;

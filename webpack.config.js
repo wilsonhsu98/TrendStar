@@ -43,7 +43,13 @@ let config = {
 		})
 	],
 	resolve: {
-		extensions: ['.js', '.vue']
+		extensions: ['.js', '.vue'],
+		/**
+		 * Vue v2.x 之後 NPM Package 預設只會匯出 runtime-only 版本
+		 */
+		alias: {
+			vue: 'vue/dist/vue.js'
+		}
 	}
 };
 
@@ -147,13 +153,6 @@ if (__PROD__) {
 			}
 		})]
 	);
-
-	/**
-	 * Vue v2.x 之後 NPM Package 預設只會匯出 runtime-only 版本
-	 */
-	config.resolve.alias = {
-		vue: 'vue/dist/vue.js'
-	};
 }
 
 module.exports = config;

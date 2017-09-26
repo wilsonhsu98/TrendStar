@@ -6,30 +6,30 @@
  			<div class="condition">
 				<div class="condition__label">Period:</div>
 				<div class="condition__element">
-					<select class="dropdown" v-model="periodSelect">
+					<select class="dropdown" :value="periodSelect" @change="setPeriod($event.target.value)">
 						<option v-for="item in period">{{ item.period }}</option>
 					</select>
 				</div>
 				<div class="condition__label">Latest PA:</div>
 				<div class="condition__element">
-					 <minus-plus-number :value="top" v-on:change="setTop"/>
+					 <minus-plus-number :value="top" @change="setTop"/>
 				</div>
 				<div class="condition__label">Sort by:</div>
 				<div class="condition__element sort">
-					<select class="dropdown" v-model="sortBy">
-						<option v-for="col in conditionCols()">{{ col }}</option>
+					<select class="dropdown" :value="sortBy" @change="setSortBy($event.target.value)">
+						<option v-for="col in conditionCols">{{ col.name }}</option>
 					</select>
 				</div>
 				<br>
 				<div class="condition__label col">Display:</div>
 				<div class="condition__element col">
 					<label class="condition__col" for="check_all"><!--
-						 --><input id="check_all" type="checkbox" v-model="checkAll"/><!--
+						 --><input id="check_all" type="checkbox" :checked="checkAll" @change="setCheckAll_($event.target.checked)"/><!--
 						 -->All<!--
 					 --></label><!--
-					 --><label class="condition__col" :for="col" v-for="col in conditionCols()"><!--
-						 --><input :id="col" type="checkbox" :value="col" v-model="columnsDisplay" :disabled="col===sortBy"/><!--
-						 -->{{ col }}<!--
+					 --><label class="condition__col" :for="col.name" v-for="col in conditionCols"><!--
+						 --><input :id="col.name" type="checkbox" :value="col.name" :checked="col.visible" :disabled="col.disabled" @change="toggleColumn(col.name)"/><!--
+						 -->{{ col.name }}<!--
 					 --></label>
 				 </div>
 				 <i class="icono-reset" @click="refreshPlayer()"></i>
@@ -38,17 +38,17 @@
 		<div id="table">
 			<div class="header-row">
 				<span class="cell delete"><i class="icono-reset" @click="refreshPlayer()"></i></span>
-				<span :class="`cell ${col}`" v-for="col in filterCols()">{{ col }}</span>
+				<span :class="`cell ${col.name}`" v-for="col in displayedCols">{{ col.name }}</span>
 			</div>
 			<template v-for="(item, index) in list">
 				<input type="radio" name="expand" class="toggle-row" @click="toggleRadio($event)"/>
 				<div class="row-grid">
 					<span class="cell delete"><i class="icono-trash" @click="deletePlayer(item.name)"></i></span>
 					<span
-						:class="`cell${col === sortBy ? ' sort' : ''}${['Rank', 'name'].indexOf(col) > -1 ? ' ' + col : ''}`"
-						v-for="(col, cIndex) in filterCols()"
-						:data-label="col">
-						{{ cIndex === 0 ? (index + 1) : formatValue(item[col], col) }}
+						:class="`cell${col.name === sortBy ? ' sort' : ''}${['Rank', 'name'].indexOf(col.name) > -1 ? ' ' + col.name : ''}`"
+						v-for="(col, cIndex) in displayedCols"
+						:data-label="col.name">
+						{{ cIndex === 0 ? (index + 1) : formatValue(item[col.name], col.name) }}
 					</span>
 				</div>
 			</template>
@@ -349,113 +349,82 @@
 </style>
 
 <script>
-	import utils from "../libs/utils";
-	import { GET_URL } from "../constants/index";
+	// import utils from "../libs/utils";
+	// import { GET_URL } from "../constants/index";
+	import { mapGetters, mapActions } from 'vuex';
 
 	export default {
 		data() {
 			return {
-				period: [{period: 'All time'}],
-				periodSelect: localStorage.getItem("pref_period") || 'All time',
-				periodSelectValues: [],
-				periodLoaded: [],
-				allGames: [],
-				list: [],
-				players: [],
-				records: [],
+				// period: [{period: 'All time'}],
+				// periodSelect: localStorage.getItem("pref_period") || 'All time',
+				// periodSelectValues: [],
+				// periodLoaded: [],
+				// allGames: [],
 				toggleSearch: false,
-				top: parseInt(localStorage.getItem("pref_top"), 10) || 10,
-				sortBy: localStorage.getItem("pref_sortby") || 'OPS',
-				hiddenPlayer: [],
-				cols: [
-					{Rank: true},
-					{name: true},
-					{PA: true},
-					{AB: true},
-					{H: true},
-					{TB: true},
-					{TOB: true},
-					{R: true},
-					{RBI: true},
-					{'1H': true},
-					{'2H': true},
-					{'3H': true},
-					{HR: true},
-					{K: true},
-					{DP: true},
-					{BB: true},
-					{SF: true},
-					{AVG: true},
-					{OBP: true},
-					{SLG: true},
-					{OPS: true}
-				],
 				toggleTarget: null,
-				loading: false
 			};
 		},
+		created () {
+			this.$store.dispatch('initFromLS');
+			this.$store.dispatch('fetchTable');
+		},
 		mounted() {
-			const pref_cols = localStorage.getItem("pref_cols");
-			if (pref_cols) this.cols = JSON.parse(pref_cols);
-			const pref_hiddenplayer = localStorage.getItem("pref_hiddenplayer");
-			if (pref_hiddenplayer) this.hiddenPlayer = JSON.parse(pref_hiddenplayer);
-
-			this.fetch();
-
 			window.addEventListener('click', this.collapseSearch, true);
 		},
 		beforeDestroy() {
 			window.removeEventListener('click', this.collapseSearch);
 		},
 		methods: {
+			...mapActions([
+				'setPeriod',
+				'setTop',
+				'setSortBy',
+				'setCheckAll',
+				'toggleColumn',
+				'deletePlayer',
+				'refreshPlayer',
+			]),
 			fetch() {
-				this.loading = true;
-				fetch(GET_URL({sheetname: 'game'}))
-					.then(res => {
-						if (res.status >= 400) throw new Error("Bad response from server");
-						return res.json();
-					})
-					.then(arr => {
-						this.allGames = arr.map(item => item.game);
-						this.period = [{period: 'All time', games: this.allGames}].concat(
-							arr.map(item => item.year + item.season)
-								.filter((value, index, self) => self.indexOf(value) === index)
-								.map(item => ({period: item, games: arr.filter(sub => (sub.year + sub.season) === item ).map(sub => sub.game)}))
-								.sort((a, b)=> a.period < b.period)
-						);
-						let games = this.period.find(item => item.period === this.periodSelect);
-						games = games ? games.games : [];
+				// this.loading = true;
+				// fetch(GET_URL({sheetname: 'game'}))
+				// 	.then(res => {
+				// 		if (res.status >= 400) throw new Error("Bad response from server");
+				// 		return res.json();
+				// 	})
+				// 	.then(arr => {
+				// 		this.allGames = arr.map(item => item.game);
+				// 		this.period = [{period: 'All time', games: this.allGames}].concat(
+				// 			arr.map(item => item.year + item.season)
+				// 				.filter((value, index, self) => self.indexOf(value) === index)
+				// 				.map(item => ({period: item, games: arr.filter(sub => (sub.year + sub.season) === item ).map(sub => sub.game)}))
+				// 				.sort((a, b)=> a.period < b.period)
+				// 		);
+				// 		let games = this.period.find(item => item.period === this.periodSelect);
+				// 		games = games ? games.games : [];
 
-						const tableArr = JSON.stringify(
-							this.allGames.filter(function(item) { return games.indexOf(item) > -1; })
-						);
+				// 		const tableArr = JSON.stringify(
+				// 			this.allGames.filter(function(item) { return games.indexOf(item) > -1; })
+				// 		);
 
-						return Promise.all([
-							GET_URL({sheetname: 'player'}),
-							GET_URL({sheetname: tableArr})
-						].map(url => fetch(url)
-							.then(res => {
-								if (res.status >= 400) throw new Error("Bad response from server");
-								return res.json();
-							})
-						));
-					}).then(arr => {
-						this.players = arr[0].map(item => item.player);
-						this.records = arr[1];
-						this.periodLoaded.push(this.periodSelect);
-						this.loading = false;
-					}).catch(err => {
-						alert(err);
-						this.loading = false;
-					});
-			},
-			conditionCols() {
-				return this.cols.map(item => Object.keys(item)[0]).filter(i => i !== 'Rank' && i!= 'name');
-			},
-			filterCols() {
-				return this.cols
-					.filter(item => item[Object.keys(item)[0]])
-					.map(item => Object.keys(item)[0]);
+				// 		return Promise.all([
+				// 			GET_URL({sheetname: 'player'}),
+				// 			GET_URL({sheetname: tableArr})
+				// 		].map(url => fetch(url)
+				// 			.then(res => {
+				// 				if (res.status >= 400) throw new Error("Bad response from server");
+				// 				return res.json();
+				// 			})
+				// 		));
+				// 	}).then(arr => {
+				// 		this.players = arr[0].map(item => item.player);
+				// 		this.records = arr[1];
+				// 		this.periodLoaded.push(this.periodSelect);
+				// 		this.loading = false;
+				// 	}).catch(err => {
+				// 		alert(err);
+				// 		this.loading = false;
+				// 	});
 			},
 			formatValue(value, col) {
 				return ['AVG', 'OBP', 'SLG', 'OPS'].indexOf(col) > -1 && value !== '-' ? value.toFixed(3) : value;
@@ -477,129 +446,53 @@
 					}
 				}
 			},
-			setTop(val) {
-				this.top = val;
-			},
-			secondFetch() {
-				const tableArr = JSON.stringify(this.periodSelectValues);
-				this.loading = true;
-				fetch(GET_URL({sheetname: tableArr}))
-					.then(res => {
-						if (res.status >= 400) throw new Error("Bad response from server");
-						return res.json();
-					})
-					.then(res => {
-						if (this.periodSelect === 'All time') {
-							this.records = res;
-						} else {
-							this.records = this.records.concat(res);
+			// secondFetch() {
+			// 	const tableArr = JSON.stringify(this.periodSelectValues);
+			// 	this.loading = true;
+			// 	fetch(GET_URL({sheetname: tableArr}))
+			// 		.then(res => {
+			// 			if (res.status >= 400) throw new Error("Bad response from server");
+			// 			return res.json();
+			// 		})
+			// 		.then(res => {
+			// 			if (this.periodSelect === 'All time') {
+			// 				this.records = res;
+			// 			} else {
+			// 				this.records = this.records.concat(res);
+			// 			}
+			// 			this.periodLoaded.push(this.periodSelect);
+			// 			this.loading = false;
+			// 		})
+			// 		.catch(err => {
+			// 			alert(err);
+			// 			this.loading = false;
+			// 		});
+			// },
+			setCheckAll_(isCheckAll) {
+				this.setCheckAll(isCheckAll);
+				if (isCheckAll) {
+					setTimeout(function() {
+						var x = document.getElementsByClassName('cell');
+						for (var i = 0, len = x.length; i < len; i++) {
+							x[i].style.display = 'block';
+							x[i].style.display = '';
 						}
-						this.periodLoaded.push(this.periodSelect);
-						this.loading = false;
-					})
-					.catch(err => {
-						alert(err);
-						this.loading = false;
 					});
-			},
-			genStatistics() {
-				return utils.genStatistics(this.players, this.records, this.top, this.periodSelectValues)
-					.filter(item => item.PA !== '-' && item.PA >= this.top * 2 / 3 && this.hiddenPlayer.indexOf(item.name) === -1)
-					.sort((a, b) => b[this.sortBy] - a[this.sortBy]);
-			},
-			deletePlayer(player) {
-				this.hiddenPlayer.push(player);
-				localStorage.setItem("pref_hiddenplayer", JSON.stringify(this.hiddenPlayer));
-				this.list = this.genStatistics();
-			},
-			refreshPlayer() {
-				this.hiddenPlayer = [];
-				localStorage.setItem("pref_hiddenplayer", JSON.stringify(this.hiddenPlayer));
-				this.list = this.genStatistics();
+				}
 			}
 		},
 		computed: {
-			columnsDisplay: {
-				get: function() {
-					return this.filterCols();
-				},
-				set: function(newValue) {
-					this.cols.forEach(item => {
-						var key = Object.keys(item)[0];
-						item[key] = newValue.indexOf(key) === -1 ?  false : true;
-					});
-
-					localStorage.setItem("pref_cols", JSON.stringify(this.cols));
-				}
-			},
-			checkAll: {
-				get: function() {
-					return this.filterCols().length === this.cols.length;
-				},
-				set: function(newValue) {
-					this.cols
-					.filter(item => ['Rank', 'name'].indexOf(Object.keys(item)[0]) === -1)
-					.forEach(item => {
-						item[Object.keys(item)[0]] = newValue;
-						if (Object.keys(item)[0] === this.sortBy) {
-							item[Object.keys(item)[0]] = true;
-						}
-					});
-
-					localStorage.setItem("pref_cols", JSON.stringify(this.cols));
-
-					if (newValue) {
-						setTimeout(function() {
-							var x = document.getElementsByClassName('cell');
-							for (var i = 0, len = x.length; i < len; i++) {
-								x[i].style.display = 'block';
-								x[i].style.display = '';
-							}
-						});
-					}
-				}
-			}
-		},
-		watch: {
-			top(top) {
-				localStorage.setItem("pref_top", top);
-				this.top = top;
-				this.list = this.genStatistics();
-			},
-			records(records) {
-				this.records = records;
-				this.list = this.genStatistics();
-			},
-			periodSelect(periodSelect) {
-				localStorage.setItem("pref_period", periodSelect);
-				this.periodSelectValues = this.period.find(item => item.period === periodSelect);
-				this.periodSelectValues = this.periodSelectValues ? this.periodSelectValues.games : [];
-				const loadedTables = this.period
-					.filter(item => this.periodLoaded.indexOf(item.period) > -1 )
-					.map(item => item.games)
-					.reduce(function(a, b) { return a.concat(b); }, []);
-				if (
-					this.periodLoaded.indexOf('All time') > -1 ||
-					this.periodLoaded.indexOf(periodSelect) > -1 ||
-					loadedTables.length === this.allGames.length
-				) {
-					this.list = this.genStatistics();
-				} else {
-					this.secondFetch();
-				}
-			},
-			sortBy(sortBy) {
-				this.cols.forEach(item => {
-					if (Object.keys(item)[0] === sortBy) {
-						item[Object.keys(item)[0]] = true;
-					}
-				});
-
-				localStorage.setItem("pref_cols", JSON.stringify(this.cols));
-				localStorage.setItem("pref_sortby", sortBy);
-				this.sortBy = sortBy;
-				this.list = this.genStatistics();
-			}
+			...mapGetters({
+				period: 'period',
+				periodSelect: 'periodSelect',
+				top: 'top',
+				sortBy: 'sortBy',
+				checkAll: 'checkAll',
+				conditionCols: 'conditionCols',
+				list: 'genStatistics',
+				displayedCols: 'displayedCols',
+				loading: 'getLoading',
+			}),
 		}
 	}
 </script>

@@ -79,12 +79,16 @@
 		computed: {
 			num: {
 				get: function() {
-					this.$emit('change', this.val);
 					return this.val;
 				},
 				set: function(newValue) {
 					this.val = newValue || 1;
 				}
+			}
+		},
+		watch: {
+			val() {
+				this.$emit('change', this.val);
 			}
 		}
 	}

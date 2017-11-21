@@ -147,12 +147,13 @@ const actions = {
     },
     setSortBy({ commit }, value) {
         commit(types.SET_SORTBY, value);
+        commit(types.SET_COLS, { col: value, visible: true });
     },
     setCheckAll({ commit }, isCheckAll) {
         commit(types.SET_CHECKALL, isCheckAll);
     },
     toggleColumn({ commit }, col) {
-        commit(types.SET_COLS, col);
+        commit(types.SET_COLS, { col });
     },
     deletePlayer({ commit }, player) {
         commit(types.DEL_PLAYER, player);
@@ -216,9 +217,9 @@ const mutations = {
             });
         window.localStorage.setItem("pref_cols", JSON.stringify(state.cols));
     },
-    [types.SET_COLS](state, col) {
+    [types.SET_COLS](state, { col, visible }) {
         const item = state.cols.find(i => i.name === col);
-        item.visible = !item.visible;
+        item.visible = visible || !item.visible;
         window.localStorage.setItem("pref_cols", JSON.stringify(state.cols));
     },
     [types.DEL_PLAYER](state, player) {

@@ -9,13 +9,13 @@ const __DEV__ = process.env.NODE_ENV === 'development';
 
 let config = {
 	entry: {
-		app: './src/main.js',
+		app: ['babel-polyfill', './src/main.js'],
 		vendor: ['vue', 'vue-router']
 	},
 	output: {
 		path: path.resolve(__dirname, './dist'),
 		publicPath: './',
-		filename: 'assets/js/[name].[hash:8].js'
+		filename: 'assets/js/[name].js'
 	},
 	module: {
 		loaders: [{
@@ -27,20 +27,33 @@ let config = {
 				plugins: ['transform-runtime']
 			}
 		}, {
-			test: /\.(png|jpg|gif|svg)$/,
+			test: /\.(png|jpg|gif)$/,
 			loader: 'url-loader',
 			options: {
 				limit: 7000,
-				name: 'assets/img/[name].[ext]'
+				name: 'assets/images/[name].[ext]'
+			}
+		}, {
+			test: /\.(ico)$/,
+			loader: 'file-loader',
+			options: {
+				name: 'assets/images/[name].[ext]'
+			}
+		}, {
+			test: /\.(woff|woff2|eot|ttf|svg)(\?.*$|$)/,
+			loader: 'url-loader?importLoaders=1',
+			options: {
+				limit: 100000,
+				name: 'assets/fonts/[name].[ext]'
 			}
 		}]
 	},
 	plugins: [
-		new webpack.optimize.CommonsChunkPlugin({
-			name: 'vendor',
-			filename: 'assets/js/[name].[hash:8].js',
-			chunks: ['app', 'vendor']
-		})
+		// new webpack.optimize.CommonsChunkPlugin({
+		// 	name: 'vendor',
+		// 	filename: 'assets/js/[name].js',
+		// 	chunks: ['app', 'vendor']
+		// })
 	],
 	resolve: {
 		extensions: ['.js', '.vue'],
@@ -48,14 +61,14 @@ let config = {
 		 * Vue v2.x 之後 NPM Package 預設只會匯出 runtime-only 版本
 		 */
 		alias: {
-			vue: 'vue/dist/vue.js'
+			vue: 'vue/dist/vue.min.js'
 		}
 	}
 };
 
 // Plugins for different environment
 if (__PROD__) {
-	config.output.filename = 'assets/js/[name].[chunkhash:8].js';
+	config.output.filename = 'assets/js/[name].js';
 	config.bail = true;
 
 	config.module.loaders.push({
@@ -96,7 +109,7 @@ if (__PROD__) {
 				warnings: false
 			}
 		}),
-		new ExtractTextPlugin('assets/css/[name].[contenthash:8].css'),
+		new ExtractTextPlugin('assets/css/[name].css'),
 		new HtmlWebpackPlugin({
 			filename: 'index.html',
 			template: 'src/index.html',

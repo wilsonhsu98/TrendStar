@@ -2,9 +2,9 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import App from './views/app';
 import store from './store';
-require('./images/icon.png');
-require('./css/font.css');
-require('./css/icono.min.css');
+import './css/font-awesome.min.css';
+import './css/font.css';
+import './images/icon.png';
 
 Vue.use(VueRouter);
 

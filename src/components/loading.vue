@@ -23,8 +23,8 @@
 		right: 0;
 		bottom: 0;
 		left: 0;
-		background-color: rgba(50, 122, 129, 0.1);
-		z-index: 0;
+		background-color: rgba(50, 122, 129, 0.2);
+		z-index: 1;
 	}
 
 	.sk-cube-grid {

@@ -8,59 +8,62 @@
 
 <style lang="scss" scoped>
 	.input {
-		width: 40px;
+		width: 44px;
 		padding: 3px 0 0 0;
 		text-align: center;
 		height: 30px;
 		box-sizing: border-box;
 		border: 2px solid rgb(166, 166, 166);
 		background-color: rgb(248, 248, 248);
-		vertical-align: middle;
+		vertical-align: top;
 	}
 
 	.button {
 		position: relative;
-		width: 22px;
-		height: 22px;
+		width: 26px;
+		height: 26px;
 	    display: inline-block;
-		border: 4px solid black;
-		vertical-align: middle;
+		border: 2px solid black;
+		vertical-align: top;
 		&:before, &:after {
 		    content: "";
 			position: absolute;
-			background-color: white;
-		}
-		&.inc {
-			border-radius: 0 5px 5px 0;
-			border-color: #5cb85c;
-			background-color: #5cb85c;
-			&:before {
-				top: 6px;
-				left: 50%;
-				width: 4px;
-				height: calc(100% - 12px);
-				margin-left: -2px;
-			}
-			&:after {
-				top: 50%;
-				left: 6px;
-				width: calc(100% - 12px);
-				height: 4px;
-				margin-top: -2px;
-			}
+			background-color: rgb(166, 166, 166);
 		}
 		&.dec {
 			border-radius: 5px 0 0 5px;
-			border-color: #d9534f;
-			background-color: #d9534f;
+			border-right: none;
+			border-color: rgb(166, 166, 166);
+			background-color: #f8f8f8;
 			&:after {
 				top: 50%;
-				left: 6px;
-				width: calc(100% - 12px);
-				height: 4px;
-				margin-top: -2px;
+				left: 8px;
+				width: calc(100% - 16px);
+				height: 2px;
+				margin-top: -1px;
 			}
 		}
+		&.inc {
+			border-radius: 0 5px 5px 0;
+			border-left: none;
+			border-color: rgb(166, 166, 166);
+			background-color: #f8f8f8;
+			&:before {
+				top: 8px;
+				left: 50%;
+				width: 2px;
+				height: calc(100% - 16px);
+				margin-left: -1px;
+			}
+			&:after {
+				top: 50%;
+				left: 8px;
+				width: calc(100% - 16px);
+				height: 2px;
+				margin-top: -1px;
+			}
+		}
+
 	}
 </style>
 

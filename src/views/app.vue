@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<div class="search-bar" ref="searchBar">
- 			<div class="search-bar__container"><i class="icono-search"></i></div>
+ 			<div class="search-bar__container"><i class="fa fa-search"></i></div>
  			<input type="checkbox" class="toggle-search" v-model="toggleSearch"/>
  			<div class="condition">
 				<div class="condition__label">Period:</div>
@@ -32,18 +32,18 @@
 						 -->{{ col.name }}<!--
 					 --></label>
 				 </div>
-				 <i class="icono-reset" @click="refreshPlayer()"></i>
+				 <i class="fa fa-refresh" @click="refreshPlayer()"></i>
 			</div>
 		</div>
 		<div id="table">
 			<div class="header-row">
-				<span class="cell delete"><i class="icono-reset" @click="refreshPlayer()"></i></span>
+				<span class="cell delete"><i class="fa fa-refresh" @click="refreshPlayer()"></i></span>
 				<span :class="`cell ${col.name}`" v-for="col in displayedCols">{{ col.name }}</span>
 			</div>
 			<template v-for="(item, index) in list">
 				<input type="radio" name="expand" class="toggle-row" @click="toggleRadio($event)"/>
 				<div class="row-grid">
-					<span class="cell delete"><i class="icono-trash" @click="deletePlayer(item.name)"></i></span>
+					<span class="cell delete"><i class="fa fa-trash" @click="deletePlayer(item.name)"></i></span>
 					<span
 						:class="`cell${col.name === sortBy ? ' sort' : ''}${['Rank', 'name'].indexOf(col.name) > -1 ? ' ' + col.name : ''}`"
 						v-for="(col, cIndex) in displayedCols"
@@ -93,6 +93,7 @@
 		border: 2px solid rgb(166, 166, 166);
 		background-color: rgb(248, 248, 248);
 		border-radius: 5px;
+		vertical-align: top;
 	}
 	#table {
 		display: table;
@@ -125,7 +126,7 @@
 		}
 	}
 	.search-bar__container,
-	.condition .icono-reset,
+	.condition .fa-refresh,
 	.toggle-row,
 	.toggle-search {
 		display: none;
@@ -157,15 +158,19 @@
 				opacity: 0;
 				&:checked {
 					&~.condition {
-						max-height: 9999px;
+						max-height: 200vh;
 						transition-timing-function: cubic-bezier(0.5, 0, 1, 0);
 						transition-delay: 0s;
+						.fa-refresh {
+							opacity: 1;
+							transition-delay: .5s;
+						}
 					}
 				}
 			}
 			.condition {
 				max-height: 0;
-				transition: max-height .8s cubic-bezier(0, 1, 0, 1) -.1s;
+				transition: max-height .5s cubic-bezier(0, 1, 0, 1) -.1s;
 				display: grid;
 				grid-template-rows: auto;
 				grid-column-gap: 3px;
@@ -175,14 +180,15 @@
 				padding: 0 3px;
 				box-sizing: border-box;
 				position: relative;
-				overflow: hidden;
 				> br {
 					display: none;
 				}
 				&__col {
 					margin: 0;
 				}
-				.icono-reset {
+				.fa-refresh {
+					opacity: 0;
+					transition: opacity .1s 0s;
 					display: inline-block;
 					position: absolute;
 					bottom: 5px;
@@ -203,7 +209,7 @@
 				grid-template-rows: auto;
 				z-index: 0;
 				background-color: #FFF;
-				transition: max-height 0.8s cubic-bezier(0, 1, 0, 1) -.1s;
+				transition: max-height 1s cubic-bezier(0, 1, 0, 1) -.1s;
 				max-height: 36px;
 				&:nth-child(4n+1) {
 					background-color: #FFF;
@@ -264,7 +270,7 @@
 				opacity: 0;
 				&:checked {
 					&+.row-grid {
-						max-height: 9999px;
+						max-height: 10000px;
 						transition-timing-function: cubic-bezier(0.5, 0, 1, 0);
 						transition-delay: 0s;
 					}
@@ -349,18 +355,11 @@
 </style>
 
 <script>
-	// import utils from "../libs/utils";
-	// import { GET_URL } from "../constants/index";
 	import { mapGetters, mapActions } from 'vuex';
 
 	export default {
 		data() {
 			return {
-				// period: [{period: 'All time'}],
-				// periodSelect: localStorage.getItem("pref_period") || 'All time',
-				// periodSelectValues: [],
-				// periodLoaded: [],
-				// allGames: [],
 				toggleSearch: false,
 				toggleTarget: null,
 			};
@@ -385,47 +384,6 @@
 				'deletePlayer',
 				'refreshPlayer',
 			]),
-			fetch() {
-				// this.loading = true;
-				// fetch(GET_URL({sheetname: 'game'}))
-				// 	.then(res => {
-				// 		if (res.status >= 400) throw new Error("Bad response from server");
-				// 		return res.json();
-				// 	})
-				// 	.then(arr => {
-				// 		this.allGames = arr.map(item => item.game);
-				// 		this.period = [{period: 'All time', games: this.allGames}].concat(
-				// 			arr.map(item => item.year + item.season)
-				// 				.filter((value, index, self) => self.indexOf(value) === index)
-				// 				.map(item => ({period: item, games: arr.filter(sub => (sub.year + sub.season) === item ).map(sub => sub.game)}))
-				// 				.sort((a, b)=> a.period < b.period)
-				// 		);
-				// 		let games = this.period.find(item => item.period === this.periodSelect);
-				// 		games = games ? games.games : [];
-
-				// 		const tableArr = JSON.stringify(
-				// 			this.allGames.filter(function(item) { return games.indexOf(item) > -1; })
-				// 		);
-
-				// 		return Promise.all([
-				// 			GET_URL({sheetname: 'player'}),
-				// 			GET_URL({sheetname: tableArr})
-				// 		].map(url => fetch(url)
-				// 			.then(res => {
-				// 				if (res.status >= 400) throw new Error("Bad response from server");
-				// 				return res.json();
-				// 			})
-				// 		));
-				// 	}).then(arr => {
-				// 		this.players = arr[0].map(item => item.player);
-				// 		this.records = arr[1];
-				// 		this.periodLoaded.push(this.periodSelect);
-				// 		this.loading = false;
-				// 	}).catch(err => {
-				// 		alert(err);
-				// 		this.loading = false;
-				// 	});
-			},
 			formatValue(value, col) {
 				return ['AVG', 'OBP', 'SLG', 'OPS'].indexOf(col) > -1 && value !== '-' ? value.toFixed(3) : value;
 			},
@@ -441,44 +399,13 @@
 				if (this.toggleSearch && !this.$refs["searchBar"].contains(event.target)) {
 					this.toggleSearch = false;
 					event.preventDefault();
-					if (event.target.classList.contains('icono-trash')) {
+					if (event.target.classList.contains('fa-trash')) {
 						event.stopPropagation();
 					}
 				}
 			},
-			// secondFetch() {
-			// 	const tableArr = JSON.stringify(this.periodSelectValues);
-			// 	this.loading = true;
-			// 	fetch(GET_URL({sheetname: tableArr}))
-			// 		.then(res => {
-			// 			if (res.status >= 400) throw new Error("Bad response from server");
-			// 			return res.json();
-			// 		})
-			// 		.then(res => {
-			// 			if (this.periodSelect === 'All time') {
-			// 				this.records = res;
-			// 			} else {
-			// 				this.records = this.records.concat(res);
-			// 			}
-			// 			this.periodLoaded.push(this.periodSelect);
-			// 			this.loading = false;
-			// 		})
-			// 		.catch(err => {
-			// 			alert(err);
-			// 			this.loading = false;
-			// 		});
-			// },
 			setCheckAll_(isCheckAll) {
 				this.setCheckAll(isCheckAll);
-				if (isCheckAll) {
-					setTimeout(function() {
-						var x = document.getElementsByClassName('cell');
-						for (var i = 0, len = x.length; i < len; i++) {
-							x[i].style.display = 'block';
-							x[i].style.display = '';
-						}
-					});
-				}
 			}
 		},
 		computed: {

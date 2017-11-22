@@ -296,7 +296,7 @@
 			}
 		}
 	}
-	@media only screen and (max-width: 760px), (max-aspect-ratio: 13/9) {
+	@media only screen and (max-width: 760px) and (orientation: portrait) {
 		#table {
 			.row-grid {
 				grid-template-columns: repeat(6, 1fr);

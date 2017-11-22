@@ -96,7 +96,7 @@
 		border-radius: 5px;
 		vertical-align: top;
 	}
-	.fa {
+	i.fa {
 		font-size: 28px;
 		vertical-align: middle;
 	}

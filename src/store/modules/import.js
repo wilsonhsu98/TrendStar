@@ -1,4 +1,8 @@
-import { rootTypes } from '../root';
+import {
+    types as rootTypes,
+    getters as rootGetters,
+    state as rootState,
+} from '../root';
 import { GET_URL, TEDDY, POST_URL } from "../../constants/index";
 import utils from "../../libs/utils";
 

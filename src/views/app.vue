@@ -20,6 +20,7 @@
 						<option v-for="col in conditionCols">{{ col.name }}</option>
 					</select>
 				</div>
+				<i class="fa fa-cloud-download" @click="refetchAllTable"></i>
 				<br>
 				<div class="condition__label col">Display:</div>
 				<div class="condition__element col">
@@ -32,12 +33,12 @@
 						 -->{{ col.name }}<!--
 					 --></label>
 				 </div>
-				 <i class="fa fa-refresh" @click="refreshPlayer()"></i>
+				 <i class="fa fa-refresh" @click="refreshPlayer"></i>
 			</div>
 		</div>
 		<div id="table">
 			<div class="header-row">
-				<span class="cell delete"><i class="fa fa-refresh" @click="refreshPlayer()"></i></span>
+				<span class="cell delete"><i class="fa fa-refresh" @click="refreshPlayer"></i></span>
 				<span :class="`cell ${col.name}`" v-for="col in displayedCols">{{ col.name }}</span>
 			</div>
 			<template v-for="(item, index) in list">
@@ -94,6 +95,13 @@
 		background-color: rgb(248, 248, 248);
 		border-radius: 5px;
 		vertical-align: top;
+	}
+	.fa {
+		font-size: 28px;
+		vertical-align: middle;
+	}
+	.fa-cloud-download {
+		color: #327a81;
 	}
 	#table {
 		display: table;
@@ -161,9 +169,9 @@
 						max-height: 200vh;
 						transition-timing-function: cubic-bezier(0.5, 0, 1, 0);
 						transition-delay: 0s;
-						.fa-refresh {
+						.fa {
 							opacity: 1;
-							transition-delay: .5s;
+							transition-delay: .4s;
 						}
 					}
 				}
@@ -186,13 +194,21 @@
 				&__col {
 					margin: 0;
 				}
-				.fa-refresh {
+				.fa {
 					opacity: 0;
 					transition: opacity .1s 0s;
 					display: inline-block;
+					color: $header_color;
+				}
+				.fa-refresh {
 					position: absolute;
-					bottom: 5px;
-					left: 5px;
+					bottom: 10px;
+					left: 12px;
+				}
+				.fa-cloud-download {
+					position: absolute;
+					bottom: 50px;
+					left: 10px;
 				}
 			}
 		}
@@ -212,20 +228,22 @@
 				transition: max-height 1s cubic-bezier(0, 1, 0, 1) -.1s;
 				max-height: 36px;
 				&:nth-child(4n+1) {
-					background-color: #FFF;
-					.cell {
-						&.Rank, &.name, &.sort, &.delete {
-							background-color: $row_odd_bgcolor;
-						}
-					}
+					background-color: $row_odd_bgcolor;
+					// background-color: #FFF;
+					// .cell {
+					// 	&.Rank, &.name, &.sort, &.delete {
+					// 		background-color: $row_odd_bgcolor;
+					// 	}
+					// }
 				}
 				&:nth-child(4n+3) {
-					background-color: #FFF;
-					.cell {
-						&.Rank, &.name, &.sort, &.delete {
-							background-color: $row_even_bgcolor;
-						}
-					}
+					background-color: $row_even_bgcolor;
+					// background-color: #FFF;
+					// .cell {
+					// 	&.Rank, &.name, &.sort, &.delete {
+					// 		background-color: $row_even_bgcolor;
+					// 	}
+					// }
 				}
 			}
 			.header-row {
@@ -278,7 +296,7 @@
 			}
 		}
 	}
-	@media only screen and (max-width: 760px) and (orientation: portrait) {
+	@media only screen and (max-width: 760px), (max-aspect-ratio: 13/9) {
 		#table {
 			.row-grid {
 				grid-template-columns: repeat(6, 1fr);
@@ -288,27 +306,29 @@
 				width: calc(100% / 6 * 5);
 			}
 		}
-		.condition {
-			grid-template-columns: repeat(6, 1fr);
-			&__label {
-				grid-column: auto / span 2;
-				justify-self: end;
-				&.col {
-					align-self: start;
+		.search-bar {
+			.condition {
+				grid-template-columns: repeat(6, 1fr);
+				&__label {
+					grid-column: auto / span 2;
+					justify-self: end;
+					&.col {
+						align-self: start;
+					}
 				}
-			}
-			&__element {
-				grid-column: auto / span 4;
-				&.col {
-					height: auto;
-					width: auto;
-					display: grid;
-					grid-template-columns: repeat(4, 1fr);
-					grid-column-gap: 8px;
-					grid-row-gap: 3px;
-					align-items: center;
-					justify-items: start;
-					margin-bottom: 4px;
+				&__element {
+					grid-column: auto / span 4;
+					&.col {
+						height: auto;
+						width: auto;
+						display: grid;
+						grid-template-columns: repeat(4, 1fr);
+						grid-column-gap: 8px;
+						grid-row-gap: 3px;
+						align-items: center;
+						justify-items: start;
+						margin-bottom: 4px;
+					}
 				}
 			}
 		}
@@ -323,31 +343,38 @@
 				width: calc(100% / 10 * 9);
 			}
 		}
-		.condition {
-			grid-template-columns: repeat(10, 1fr);
-			&__label {
-				grid-column: auto / span 2;
-				justify-self: end;
-				&.col {
-					align-self: start;
+		.search-bar {
+			.condition {
+				grid-template-columns: repeat(10, 1fr);
+				&__label {
+					grid-column: auto / span 2;
+					justify-self: end;
+					&.col {
+						align-self: start;
+					}
 				}
-			}
-			&__element {
-				grid-column: auto / span 3;
-				&.sort {
-					grid-column: auto / span 8;
+				&__element {
+					grid-column: auto / span 3;
+					&.sort {
+						grid-column: auto / span 8;
+					}
+					&.col {
+						grid-column: auto / span 8;
+						height: auto;
+						width: auto;
+						display: grid;
+						grid-template-columns: repeat(8, 1fr);
+						grid-column-gap: 10px;
+						grid-row-gap: 3px;
+						align-items: center;
+						justify-items: start;
+						margin-bottom: 4px;
+					}
 				}
-				&.col {
-					grid-column: auto / span 8;
-					height: auto;
-					width: auto;
-					display: grid;
-					grid-template-columns: repeat(8, 1fr);
-					grid-column-gap: 10px;
-					grid-row-gap: 3px;
-					align-items: center;
-					justify-items: start;
-					margin-bottom: 4px;
+				.fa-cloud-download {
+					position: absolute;
+					bottom: 10px;
+					left: 50px;
 				}
 			}
 		}
@@ -365,8 +392,8 @@
 			};
 		},
 		created () {
-			this.$store.dispatch('initFromLS');
-			this.$store.dispatch('fetchTable');
+			this.initFromLS();
+			this.fetchTable();
 		},
 		mounted() {
 			window.addEventListener('click', this.collapseSearch, true);
@@ -376,6 +403,9 @@
 		},
 		methods: {
 			...mapActions([
+				'initFromLS',
+				'fetchTable',
+				'refetchAllTable',
 				'setPeriod',
 				'setTop',
 				'setSortBy',

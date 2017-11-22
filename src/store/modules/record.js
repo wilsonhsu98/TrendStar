@@ -1,4 +1,9 @@
-import { rootTypes } from '../root';
+import axios from 'axios';
+import {
+    types as rootTypes,
+    getters as rootGetters,
+    state as rootState,
+} from '../root';
 import { GET_URL } from "../../constants/index";
 import utils from "../../libs/utils";
 
@@ -87,42 +92,48 @@ const actions = {
     fetchTable({ commit }, tableName) {
         commit(rootTypes.LOADING, true);
         if (tableName === undefined || tableName === 'all') {
-            fetch(GET_URL({ action: 'all' }))
-                .then(res => {
-                    if (res.status >= 400) throw new Error("Bad response from server");
-                    return res.json();
-                })
-                .then(res => {
-                    let records = [];
-                    res[0].tables.forEach(table => {
-                        const values = res.filter(item => item._table === table);
-                        window.localStorage.setItem(table, JSON.stringify(values));
-                        if (table.match(/\d{8}-\d{1}/g)) {
-                            records = records.concat(values);
-                        }
+            if (window.localStorage.getItem('game') && window.localStorage.getItem('player')) {
+                let records = [];
+                for (const table in window.localStorage){
+                    if (table.match(/\d{8}-\d{1}/g)) {
+                        const values = JSON.parse(window.localStorage.getItem(table));
+                        records = records.concat(values);
+                    }
+                }
+                commit(types.GET_PERIOD, JSON.parse(window.localStorage.getItem('game')));
+                commit(types.GET_PLAYERS, JSON.parse(window.localStorage.getItem('player')));
+                commit(types.GET_RECORDS, records);
+                commit(rootTypes.LOADING, false);
+            } else {
+                axios.get(GET_URL({ action: 'all' }))
+                    .then(res => {
+                        let records = [];
+                        res.data[0].tables.forEach(table => {
+                            const values = res.data.filter(item => item._table === table);
+                            window.localStorage.setItem(table, JSON.stringify(values));
+                            if (table.match(/\d{8}-\d{1}/g)) {
+                                records = records.concat(values);
+                            }
+                        });
+                        commit(types.GET_PERIOD, JSON.parse(window.localStorage.getItem('game')));
+                        commit(types.GET_PLAYERS, JSON.parse(window.localStorage.getItem('player')));
+                        commit(types.GET_RECORDS, records);
+                        commit(rootTypes.LOADING, false);
+                    })
+                    .catch(err => {
+                        alert(err);
+                        commit(rootTypes.LOADING, false);
                     });
-                    commit(types.GET_PERIOD, JSON.parse(window.localStorage.getItem('game')));
-                    commit(types.GET_PLAYERS, JSON.parse(window.localStorage.getItem('player')));
-                    commit(types.GET_RECORDS, records);
-                    commit(rootTypes.LOADING, false);
-                })
-                .catch(err => {
-                    alert(err);
-                    commit(rootTypes.LOADING, false);
-                });
+            }
         } else {
             new Promise(function(resolve, reject) {
                     if (window.localStorage.getItem(tableName)) {
                         resolve(JSON.parse(window.localStorage.getItem(tableName)))
                     } else {
-                        fetch(GET_URL({ sheetname: tableName }))
+                        axios.get(GET_URL({ sheetname: tableName }))
                             .then(res => {
-                                if (res.status >= 400) reject("Bad response from server");
-                                return res.json();
-                            })
-                            .then(res => {
-                                window.localStorage.setItem(tableName, JSON.stringify(res))
-                                resolve(res);
+                                window.localStorage.setItem(tableName, JSON.stringify(res.data))
+                                resolve(res.data);
                             });
                     }
                 })
@@ -135,6 +146,10 @@ const actions = {
                     commit(rootTypes.LOADING, false);
                 });
         }
+    },
+    refetchAllTable({ commit }) {
+        window.localStorage.removeItem('game');
+        actions.fetchTable({ commit });
     },
     fetchGames({ commit }) {
         // this.dispatch('fetchTable', 'game');

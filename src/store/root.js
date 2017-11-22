@@ -1,4 +1,4 @@
-const rootTypes = {
+const types = {
 	LOADING: 'LOADING'
 }
 
@@ -12,20 +12,20 @@ const getters = {
 
 const actions = {
     toggleLoading({ commit }, isLoading) {
-        commit(rootTypes.LOADING, isLoading);
+        commit(types.LOADING, isLoading);
     }
 }
 
 const mutations = {
-    [rootTypes.LOADING](state, isLoading) {
+    [types.LOADING](state, isLoading) {
         state.loading = isLoading;
     }
 }
 
 export {
-    rootTypes,
+    types,
 	state,
 	getters,
 	actions,
-	mutations
+	mutations,
 }

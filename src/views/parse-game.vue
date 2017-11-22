@@ -39,10 +39,11 @@
 
 	export default {
 		created () {
-			this.$store.dispatch('fetchTwoOrigin');
+			this.fetchTwoOrigin();
 		},
 		methods: {
 			...mapActions([
+				'fetchTwoOrigin',
 				'importData',
 				'toggleTodo'
 			])

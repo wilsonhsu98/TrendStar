@@ -346,6 +346,7 @@
 			}
 			.toggle-row {
 				left: 0;
+				cursor: initial;
 				&:checked {
 					&+.row-grid {
 						max-height: 10000px;

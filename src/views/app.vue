@@ -342,6 +342,7 @@
 					border: none;
 					box-shadow: none;
 					background-color: transparent;
+					display: flex;
 				}
 			}
 			.toggle-row {

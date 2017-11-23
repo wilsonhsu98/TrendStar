@@ -51,6 +51,14 @@
 						:data-label="col.name">
 						{{ cIndex === 0 ? (index + 1) : formatValue(item[col.name], col.name) }}
 					</span>
+					<div v-if="item.listByGame.length" class="cell chart">
+						<div class="bar" v-for="cube in item.listByGame">
+							<template v-for="(cell, i) in cube">
+								<span v-if="i === cube.length - 1" class="game">{{ cell }}</span>
+								<span v-else :class="`item ${cell.color} ${cell.exclude ? 'exclude' : ''}`">{{ cell.content }}</span>
+							</template>
+						</div>
+					</div>
 				</div>
 			</template>
 		</div>
@@ -85,6 +93,7 @@
 		&__col {
 			margin-right: 10px;
 			vertical-align: middle;
+			cursor: pointer;
 		}
 	}
 
@@ -99,6 +108,7 @@
 	i.fa {
 		font-size: 28px;
 		vertical-align: middle;
+		cursor: pointer;
 	}
 	.fa-cloud-download {
 		color: #327a81;
@@ -111,7 +121,7 @@
 		box-sizing: border-box;
 		color: $row_color;
 		border: 1px solid $table_bordercolor;
-		overflow: hidden;
+		position: relative;
 		.header-row {
 			display: table-row;
 			background: $header_bgcolor;
@@ -119,7 +129,22 @@
 			.cell {
 				&.Rank, &.delete { width: 50px; }
 				&.name { width: 70px; }
-				// &.AVG, &.OBP, &.SLG, &.OPS { width: 60px; }
+			}
+		}
+		.toggle-row {
+			display: block;
+			position: absolute;
+			left: 50px;
+			z-index: 1;
+			height: 36px;
+			width: calc(100% - 50px);
+			margin: 0;
+			opacity: 0;
+			cursor: pointer;
+			&:checked {
+				&+.row-grid .cell.chart {
+					display: flex;
+				}
 			}
 		}
 		.row-grid {
@@ -131,11 +156,43 @@
 			display: table-cell;
 			line-height: 36px;
 			text-align: center;
+			&.chart {
+				background-color: #fff;
+				position: absolute;
+				left: 170px;
+				right: -1px;
+				z-index: 2;
+
+				display: none;
+				flex-direction: row-reverse;
+				justify-content: space-around;
+				align-items: flex-end;
+				font-size: 12px;
+				margin-top: 36px;
+				padding-top: 5px;
+				border: 1px solid $table_bordercolor;
+				border-top: 0;
+				box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+				.item {
+					display: block;
+					height: 20px;
+					line-height: 20px;
+					color: #fff;
+					margin-bottom: 1px;
+					&.red { background-color: #ef1010; }
+					&.yellow { background-color: #efaf34; }
+					&.blue { background-color: #4d9de5; }
+					&.exclude { opacity: 0.1; }
+				}
+				.game {
+					display: block;
+					line-height: 20px;
+				}
+			}
 		}
 	}
 	.search-bar__container,
 	.condition .fa-refresh,
-	.toggle-row,
 	.toggle-search {
 		display: none;
 	}
@@ -216,6 +273,7 @@
 			display: block;
 			border: none;
 			margin-top: 40px;
+			overflow: hidden;
 			position: relative;
 			z-index: 0;
 
@@ -252,11 +310,11 @@
 			.cell {
 				display: block;
 				box-sizing: border-box;
-				&:not(.sort):not(.Rank):not(.name):not(.delete) {
+				&:not(.sort):not(.Rank):not(.name):not(.delete):not(.chart) {
 					grid-column: auto / span 2;
 					text-align: left;
 				}
-				&:not(.Rank):not(.name):not(.delete) {
+				&:not(.Rank):not(.name):not(.delete):not(.chart) {
 					&:before {
 						content: attr(data-label) ":";
 						display: inline-block;
@@ -277,15 +335,17 @@
 				&.delete {
 					grid-area: delete;
 				}
+				&.chart {
+					grid-area: chart;
+					position: initial;
+					margin-top: 0;
+					border: none;
+					box-shadow: none;
+					background-color: transparent;
+				}
 			}
 			.toggle-row {
-				display: block;
-				position: absolute;
-				z-index: 1;
-				height: 36px;
-				// width: 100%;
-				margin: 0;
-				opacity: 0;
+				left: 0;
 				&:checked {
 					&+.row-grid {
 						max-height: 10000px;
@@ -296,11 +356,12 @@
 			}
 		}
 	}
-	@media only screen and (max-width: 760px) and (orientation: portrait) {
+	@media only screen and (max-width: 760px) and (max-aspect-ratio: 13/9) {
 		#table {
 			.row-grid {
 				grid-template-columns: repeat(6, 1fr);
-				grid-template-areas: "rank name name sort sort delete";
+				grid-template-areas: "rank name name sort sort delete"
+									"chart chart chart chart chart chart";
 			}
 			.toggle-row {
 				width: calc(100% / 6 * 5);
@@ -333,11 +394,12 @@
 			}
 		}
 	}
-	@media only screen and (max-width: 760px) and (orientation: landscape) {
+	@media only screen and (max-width: 760px) and (min-aspect-ratio: 13/9) {
 		#table {
 			.row-grid {
 				grid-template-columns: repeat(10, 1fr);
-				grid-template-areas: "rank name name sort sort sort sort sort sort delete";
+				grid-template-areas: "rank name name sort sort sort sort sort sort delete"
+									"chart chart chart chart chart chart chart chart chart chart";
 			}
 			.toggle-row {
 				width: calc(100% / 10 * 9);

@@ -30,6 +30,30 @@ utils.genStatistics = function(players, records, filterPA, filterGames) {
             .filter(function(item) { return filterGames === undefined || (Array.isArray(filterGames) && filterGames.length === 0) ? true : filterGames.indexOf(item._table) > -1; })
             .filter(function(item) { return item.name === name })
             .slice(0, filterPA);
+
+
+        let limit = 1;
+        var games = top
+            .map(item => item._table)
+            .filter(function(v, i, self) { return self.indexOf(v) === i; })
+            .map((game) => {
+                return sortRecords
+                    .filter(function(item) { return item._table === game && item.name === name; })
+                    .map(item => {
+                        let color = 'blue';
+                        if (['1H', '2H', '3H', 'HR'].indexOf(item.content) > -1) color = 'red';
+                        if (['BB', '犧飛'].indexOf(item.content) > -1) color = 'yellow';
+                        return {
+                            name: item.name,
+                            content: item.content,
+                            order: item.order,
+                            exclude: limit++ > filterPA,
+                            color,
+                        };
+                    }).concat(game.substr(4));
+            });
+
+
         top.forEach(function(item) {
             pa += 1;
             ab += ['1H', '2H', '3H', 'HR', '飛球', '滾地', 'K', 'E', '野選', '雙殺'].indexOf(item.content) > -1 ? 1 : 0;
@@ -70,6 +94,7 @@ utils.genStatistics = function(players, records, filterPA, filterGames) {
             OBP: '-',
             SLG: '-',
             OPS: '-',
+            listByGame: games,
         };
         if (pa === 0) {} else if (pa > 0 && ab === 0) {
             obj = Object.assign(obj, {

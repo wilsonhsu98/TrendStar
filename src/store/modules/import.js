@@ -1,3 +1,4 @@
+import axios from 'axios';
 import {
     types as rootTypes,
     getters as rootGetters,
@@ -116,7 +117,53 @@ const actions = {
             alert(err);
             commit(rootTypes.LOADING, false);
         });
-    }
+    },
+    importOneGame({ commit }, game) {
+        commit(rootTypes.LOADING, true);
+        let params = new FormData();
+        params.append("sheetname", game);
+        params.append("_del", true);
+        axios.post(POST_URL, params, { headers: { 'Content-Type': 'multipart/form-data' } })
+            .then(() => {
+                return axios.get(GET_URL({ action: '2DArray', fileId: TEDDY, sheetname: game }));
+            })
+            .then(res => {
+                params = new FormData();
+                params.append("sheetname", game);
+                params.append("data", JSON.stringify(utils.parseGame(res.data)));
+                return axios.post(POST_URL, params, { headers: { 'Content-Type': 'multipart/form-data' } })
+                commit(rootTypes.LOADING, false);
+            })
+            .then(() => {
+                return axios.all([axios.get(GET_URL({ sheetname: 'game' })), axios.get(GET_URL({ fileId: TEDDY, sheetname: '比賽結果' }))]);
+            })
+            .then(res => {
+                const wilsonSummary = res[0].data.find(item => item.game === game);
+                const teddySummary = res[1].data.find(item => item['場次'] === game);
+                let postData = {
+                    game: game,
+                    result: ['win', 'lose', 'tie', ''][
+                        ['勝', '敗', '和', ''].indexOf(teddySummary ? teddySummary['結果'] : 3)
+                    ],
+                    year: teddySummary ? teddySummary['年度'] : '',
+                    season: teddySummary ? teddySummary['季度'] : '',
+                };
+                if (wilsonSummary) {
+                    postData._id = wilsonSummary._id;
+                }
+                params = new FormData();
+                params.append("sheetname", 'game');
+                params.append("data", JSON.stringify(postData));
+                return axios.post(POST_URL, params, { headers: { 'Content-Type': 'multipart/form-data' } })
+            })
+            .then(() => {
+                commit(rootTypes.LOADING, false);
+            })
+            .catch(err => {
+                alert(err);
+                commit(rootTypes.LOADING, false);
+            });
+    },
 }
 
 const mutations = {

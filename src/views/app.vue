@@ -52,11 +52,13 @@
 						{{ cIndex === 0 ? (index + 1) : formatValue(item[col.name], col.name) }}
 					</span>
 					<div v-if="item.listByGame.length" class="cell chart">
-						<div class="bar" v-for="cube in item.listByGame">
-							<template v-for="(cell, i) in cube">
-								<span v-if="i === cube.length - 1" class="game">{{ cell }}</span>
-								<span v-else :class="`item ${cell.color} ${cell.exclude ? 'exclude' : ''}`">{{ cell.content }}</span>
-							</template>
+						<div class="chart-inner">
+							<div class="bar" v-for="cube in item.listByGame">
+								<template v-for="(cell, i) in cube">
+									<span v-if="i === cube.length - 1" class="game">{{ cell }}</span>
+									<span v-else :class="`item ${cell.color} ${cell.exclude ? 'exclude' : ''}`">{{ cell.content }}</span>
+								</template>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -164,19 +166,30 @@
 				z-index: 2;
 
 				display: none;
-				flex-direction: row-reverse;
-				justify-content: space-around;
-				align-items: flex-end;
+
 				font-size: 12px;
 				margin-top: 36px;
 				padding-top: 5px;
 				border: 1px solid $table_bordercolor;
 				border-top: 0;
 				box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+				.chart-inner {
+					display: flex;
+					flex-direction: row-reverse;
+					align-items: flex-end;
+					width: 100%;
+					overflow-x: auto;
+				}
+				.bar {
+					flex-grow: 1;
+					min-width: 50px
+				}
 				.item {
 					display: block;
 					height: 20px;
 					line-height: 20px;
+					width: 36px;
+					margin: auto;
 					color: #fff;
 					margin-bottom: 1px;
 					&.red { background-color: #ef1010; }
@@ -187,6 +200,8 @@
 				.game {
 					display: block;
 					line-height: 20px;
+					width: 36px;
+					margin: auto;
 				}
 			}
 		}

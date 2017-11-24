@@ -1,17 +1,23 @@
 <template>
 	<div class="parse-container">
-		<button class="parse-btn" @click="importData">Parse Game</button>
+		<button class="parse-btn" @click="importData">
+			Batch Upload&nbsp;<i class="fa fa-cloud-upload" style="vertical-align: middle;"></i>
+		</button>
 		<div class="parse-item" v-for="(item, index) in list">
 			<label :for="`chk${index}`">
 				<input type="checkbox" :id="`chk${index}`" :disabled="item.disabled" :checked="item.checked" @change="toggleTodo(item.game)"/>
 				{{ item.game }}
 			</label>
+			<button :disabled="!item.disabled" class="parse-btn" style="padding: 4px 6px;" @click="importOneGame(item.game)">
+				Re-upload&nbsp;<i class="fa fa-cloud-upload" style="vertical-align: middle;"></i>
+			</button>
 		</div>
 		<loading v-if="loading"></loading>
 	</div>
 </template>
 
 <style lang="scss">
+	@import "../scss/variable";
 	@import "../scss/base";
 
 	.parse-container {
@@ -23,13 +29,16 @@
 	}
 	.parse-btn {
 		border-radius: 5px;
-		border-color: #5cb85c;
-		background-color: #5cb85c;
+		border-color: $header_bgcolor;
+		background-color: $header_bgcolor;
 		color: white;
 		border: 1px solid;
 		padding: 10px 20px;
 		&:focus {
 			outline: none;
+		}
+		&:disabled {
+			opacity: .3;
 		}
 	}
 </style>
@@ -45,6 +54,7 @@
 			...mapActions([
 				'fetchTwoOrigin',
 				'importData',
+				'importOneGame',
 				'toggleTodo'
 			])
 		},

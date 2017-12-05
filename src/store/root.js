@@ -1,5 +1,5 @@
 const types = {
-	LOADING: 'LOADING'
+    LOADING: 'LOADING'
 }
 
 const state = {
@@ -7,7 +7,7 @@ const state = {
 }
 
 const getters = {
-	getLoading: state => state.loading
+    getLoading: state => state.loading
 }
 
 const actions = {
@@ -24,8 +24,8 @@ const mutations = {
 
 export {
     types,
-	state,
-	getters,
-	actions,
-	mutations,
-}
+    state,
+    getters,
+    actions,
+    mutations,
+};

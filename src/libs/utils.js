@@ -142,7 +142,7 @@ utils.parseGame = function(arr) {
         result = [],
         scan = [],
         innArray = ['', '一', '二', '三', '四', '五', '六', '七'];
-    while (col < arr[0].length) {
+    while (col < arr[0].length && row < arr.length) {
         if (scan.indexOf(row + '' + col) === -1) {
             scan.push(row + '' + col);
             if (arr[row][col]) {
@@ -164,15 +164,19 @@ utils.parseGame = function(arr) {
             }
         }
         row++;
-        if (row === arr.length) {
+        if (result.lengthrow === arr.length) {
             if (scan.indexOf('1' + col) === -1) {
                 row = 1;
             } else {
                 col += 3;
-                if (result[result.length - 1]._row === arr.length - 1) {
-                    row = 1;
+                if (result[result.length - 1]) {
+                    if (result[result.length - 1]._row === arr.length - 1) {
+                        row = 1;
+                    } else {
+                        row = result[result.length - 1]._row + 1
+                    }
                 } else {
-                    row = result[result.length - 1]._row + 1
+                    row = 1;
                 }
             }
         }
@@ -181,4 +185,12 @@ utils.parseGame = function(arr) {
         delete item._row;
         return item;
     });
+};
+
+utils.arr2obj = function(arr) {
+    let obj = {};
+    arr.forEach((item, i) => {
+        obj[i] = item;
+    })
+    return obj;
 };

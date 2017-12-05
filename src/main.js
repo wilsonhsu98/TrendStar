@@ -1,33 +1,25 @@
 import Vue from 'vue';
-import VueRouter from 'vue-router';
-import App from './views/app';
 import store from './store';
+import router from './router';
+import { db } from './firebase';
+
 import './css/font-awesome.min.css';
 import './css/font.css';
-import './images/icon.png';
-
-Vue.use(VueRouter);
 
 let componentsReq = require.context("./components/", false, /\.vue$/);
 componentsReq.keys().forEach(path => {
-	Vue.component(path.match(/\.\/(.*?)\.vue/)[1], componentsReq(path).default);
-});
-
-const Foo = { template: '<div>foo</div>' }
-const Bar = { template: '<div>bar</div>' }
-
-const router = new VueRouter({
-	routes: [
-		{ path: '/', component: App },
-		{ path: '/parse', component: require('./views/parse-game').default },
-		{ path: '/foo', component: Foo },
-		{ path: '/bar', component: Bar },
-		{ path: '*', redirect: '/' }
-	]
+    Vue.component(path.replace(/(\_|\b|\-)./g, function(a) { return a.toUpperCase(); }).replace(/(\_|\b|\-|\.\/|\.vue)*/ig, ""), componentsReq(path).default);
 });
 
 const app = new Vue({
-	el: '#app',
-	store,
-	router
+    el: '#app',
+    store,
+    router,
 });
+
+document.title = 'TrendStar';
+let link = document.createElement('link');
+link.type = 'image/png';
+link.rel = 'shortcut icon';
+link.href = require('./images/icon.png');
+document.getElementsByTagName('head')[0].appendChild(link);

@@ -164,7 +164,7 @@ utils.parseGame = function(arr) {
             }
         }
         row++;
-        if (result.lengthrow === arr.length) {
+        if (row === arr.length) {
             if (scan.indexOf('1' + col) === -1) {
                 row = 1;
             } else {
@@ -185,12 +185,4 @@ utils.parseGame = function(arr) {
         delete item._row;
         return item;
     });
-};
-
-utils.arr2obj = function(arr) {
-    let obj = {};
-    arr.forEach((item, i) => {
-        obj[i] = item;
-    })
-    return obj;
 };

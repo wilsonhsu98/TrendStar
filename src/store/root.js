@@ -1,26 +1,26 @@
 const types = {
-    LOADING: 'LOADING'
-}
+    LOADING: 'LOADING',
+};
 
 const state = {
-    loading: false
-}
+    loading: false,
+};
 
 const getters = {
-    getLoading: state => state.loading
-}
+    getLoading: state => state.loading,
+};
 
 const actions = {
     toggleLoading({ commit }, isLoading) {
         commit(types.LOADING, isLoading);
-    }
-}
+    },
+};
 
 const mutations = {
     [types.LOADING](state, isLoading) {
         state.loading = isLoading;
-    }
-}
+    },
+};
 
 export {
     types,

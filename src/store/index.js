@@ -4,8 +4,8 @@ import Vuex from 'vuex';
 // root
 import { state, actions, mutations, getters } from './root';
 // modules
-import importGame from './modules/import_fb';
-import record from './modules/record_fb';
+import importGame from './modules/import';
+import record from './modules/record';
 
 Vue.use(Vuex);
 

@@ -6,6 +6,7 @@ import {
 } from '../root';
 import { GET_URL } from "../../constants/index";
 import utils from "../../libs/utils";
+import { db } from "../../firebase";
 
 const types = {
     INIT_FROM_LS: 'RECORD/INIT_FROM_LS',
@@ -19,7 +20,7 @@ const types = {
     SET_COLS: 'RECORD/SET_COLS',
     DEL_PLAYER: 'RECORD/DEL_PLAYER',
     REFRESH_PLAYER: 'RECORD/REFRESH_PLAYER',
-}
+};
 
 const state = {
     players: [],
@@ -53,7 +54,7 @@ const state = {
         { name: 'SLG', visible: true },
         { name: 'OPS', visible: true }
     ],
-}
+};
 
 const getters = {
     period: state => state.period,
@@ -83,7 +84,7 @@ const getters = {
     displayedCols: state => {
         return state.cols.filter(item => item.visible);
     },
-}
+};
 
 const actions = {
     initFromLS({ commit }) {
@@ -91,68 +92,39 @@ const actions = {
     },
     fetchTable({ commit }, tableName) {
         commit(rootTypes.LOADING, true);
-        if (tableName === undefined || tableName === 'all') {
-            if (window.localStorage.getItem('game') && window.localStorage.getItem('player')) {
-                let records = [];
-                for (const table in window.localStorage){
-                    if (table.match(/\d{8}-\d{1}/g)) {
-                        const values = JSON.parse(window.localStorage.getItem(table));
-                        records = records.concat(values);
-                    }
-                }
-                commit(types.GET_PERIOD, JSON.parse(window.localStorage.getItem('game')));
-                commit(types.GET_PLAYERS, JSON.parse(window.localStorage.getItem('player')));
+        Promise.all([
+                db.collection('players').get().then(snapshot => snapshot.docs.map(doc => doc.id)),
+                db.collection('games').get().then(snapshot => snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() })))
+            ])
+            .then(res => {
+                const records = res[1].map(item => {
+                    item.data.orders.forEach(sub => {
+                        sub._table = item.id;
+                    });
+                    return item.data.orders;
+                }).reduce((a, b) => a.concat(b), []);
+                commit(types.GET_PLAYERS, res[0]);
+                commit(types.GET_PERIOD, res[1].map(item => Object.assign({}, item.data, { game: item.id })));
                 commit(types.GET_RECORDS, records);
                 commit(rootTypes.LOADING, false);
-            } else {
-                axios.get(GET_URL({ action: 'all' }))
-                    .then(res => {
-                        let records = [];
-                        res.data[0].tables.forEach(table => {
-                            const values = res.data.filter(item => item._table === table);
-                            window.localStorage.setItem(table, JSON.stringify(values));
-                            if (table.match(/\d{8}-\d{1}/g)) {
-                                records = records.concat(values);
-                            }
-                        });
-                        commit(types.GET_PERIOD, JSON.parse(window.localStorage.getItem('game')));
-                        commit(types.GET_PLAYERS, JSON.parse(window.localStorage.getItem('player')));
-                        commit(types.GET_RECORDS, records);
-                        commit(rootTypes.LOADING, false);
-                    })
-                    .catch(err => {
-                        alert(err);
-                        commit(rootTypes.LOADING, false);
+            })
+            .catch(err => {
+                alert(err);
+                commit(rootTypes.LOADING, false);
+            });
+
+        db.collection('games')
+            .onSnapshot(snapshot => {
+                const changedData = snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }));
+                const records = changedData.map(item => {
+                    item.data.orders.forEach(sub => {
+                        sub._table = item.id;
                     });
-            }
-        } else {
-            new Promise(function(resolve, reject) {
-                    if (window.localStorage.getItem(tableName)) {
-                        resolve(JSON.parse(window.localStorage.getItem(tableName)))
-                    } else {
-                        axios.get(GET_URL({ sheetname: tableName }))
-                            .then(res => {
-                                window.localStorage.setItem(tableName, JSON.stringify(res.data))
-                                resolve(res.data);
-                            });
-                    }
-                })
-                .then(res => {
-                    console.log(res);
-                    commit(rootTypes.LOADING, false);
-                })
-                .catch(err => {
-                    alert(err);
-                    commit(rootTypes.LOADING, false);
-                });
-        }
-    },
-    refetchAllTable({ commit }) {
-        window.localStorage.removeItem('game');
-        actions.fetchTable({ commit });
-    },
-    fetchGames({ commit }) {
-        // this.dispatch('fetchTable', 'game');
+                    return item.data.orders;
+                }).reduce((a, b) => a.concat(b), []);
+                commit(types.GET_PERIOD, changedData.map(item => Object.assign({}, item.data, { game: item.id })));
+                commit(types.GET_RECORDS, records);
+            })
     },
     setPeriod({ commit }, value) {
         commit(types.SET_PERIOD, value);
@@ -175,8 +147,8 @@ const actions = {
     },
     refreshPlayer({ commit }) {
         commit(types.REFRESH_PLAYER);
-    }
-}
+    },
+};
 
 const mutations = {
     [types.INIT_FROM_LS](state) {
@@ -200,7 +172,7 @@ const mutations = {
         );
     },
     [types.GET_PLAYERS](state, data) {
-        state.players = data.map(item => item.player);
+        state.players = data;
     },
     [types.GET_RECORDS](state, data) {
         state.records = data;
@@ -244,12 +216,12 @@ const mutations = {
     [types.REFRESH_PLAYER](state) {
         state.hiddenPlayer = [];
         window.localStorage.setItem("pref_hiddenplayer", JSON.stringify(state.hiddenPlayer));
-    }
-}
+    },
+};
 
 export default {
     state,
     getters,
     actions,
-    mutations
-}
+    mutations,
+};

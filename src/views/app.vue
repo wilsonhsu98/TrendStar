@@ -20,7 +20,6 @@
 						<option v-for="col in conditionCols">{{ col.name }}</option>
 					</select>
 				</div>
-				<i class="fa fa-cloud-download" @click="refetchAllTable"></i>
 				<br>
 				<div class="condition__label col">Display:</div>
 				<div class="condition__element col">
@@ -111,9 +110,6 @@
 		font-size: 28px;
 		vertical-align: middle;
 		cursor: pointer;
-	}
-	.fa-cloud-download {
-		color: #327a81;
 	}
 	#table {
 		display: table;
@@ -276,11 +272,6 @@
 					position: absolute;
 					bottom: 10px;
 					left: 12px;
-				}
-				.fa-cloud-download {
-					position: absolute;
-					bottom: 50px;
-					left: 10px;
 				}
 			}
 		}
@@ -450,11 +441,6 @@
 						margin-bottom: 4px;
 					}
 				}
-				.fa-cloud-download {
-					position: absolute;
-					bottom: 10px;
-					left: 50px;
-				}
 			}
 		}
 	}
@@ -484,7 +470,6 @@
 			...mapActions([
 				'initFromLS',
 				'fetchTable',
-				'refetchAllTable',
 				'setPeriod',
 				'setTop',
 				'setSortBy',

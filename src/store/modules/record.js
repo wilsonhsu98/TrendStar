@@ -130,6 +130,7 @@ const actions = {
                 ])
                 .then(res => {
                     commit(types.GET_PLAYERS, res[0]);
+                    window.localStorage.setItem('players', JSON.stringify(res[0]));
                     operateGames(res[1]);
                 })
                 .catch(err => {

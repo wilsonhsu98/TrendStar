@@ -17,6 +17,12 @@ const app = new Vue({
     router,
 });
 
+const version = 1;
+if (window.localStorage.getItem('version') !== version.toString()) {
+	window.localStorage.clear();
+	window.localStorage.setItem('version', version.toString())
+}
+
 document.title = 'TrendStar';
 let link = document.createElement('link');
 link.type = 'image/png';

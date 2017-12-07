@@ -80,7 +80,7 @@ const getters = {
     },
     genStatistics: state => {
         return utils.genStatistics(state.players, state.records, state.top, state.period.find(item => item.select).games)
-            .filter(item => item.PA !== '-' && item.PA >= state.top * 2 / 3 && state.hiddenPlayer.indexOf(item.name) === -1)
+            .filter(item => item.PA !== '-' && item.PA === state.top && state.hiddenPlayer.indexOf(item.name) === -1)
             .sort((a, b) => b[state.sortBy] - a[state.sortBy]);
     },
     displayedCols: state => {
@@ -94,31 +94,49 @@ const actions = {
         commit(types.INIT_FROM_LS);
     },
     fetchTable({ commit }, tableName) {
-        commit(rootTypes.LOADING, true);
-        Promise.all([
-                db.collection('players').get().then(snapshot => snapshot.docs.map(doc => doc.id)),
-                db.collection('games').get().then(snapshot => snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() })))
-            ])
-            .then(res => {
-                const dates = res[1].filter(item => item.data.timestamp).map(item => new Date(item.data.timestamp));
-                if (dates.length) {
-                    commit(types.SET_LASTUPDATE, new Date(Math.max.apply(null, dates)));
-                }
-                const records = res[1].map(item => {
-                    item.data.orders.forEach(sub => {
-                        sub._table = item.id;
-                    });
-                    return item.data.orders;
-                }).reduce((a, b) => a.concat(b), []);
-                commit(types.GET_PLAYERS, res[0]);
-                commit(types.GET_PERIOD, res[1].map(item => Object.assign({}, item.data, { game: item.id })));
-                commit(types.GET_RECORDS, records);
-                commit(rootTypes.LOADING, false);
-            })
-            .catch(err => {
-                alert(err);
-                commit(rootTypes.LOADING, false);
-            });
+        const operateGames = function(changedData) {
+            const dates = changedData.filter(item => item.data.timestamp).map(item => new Date(item.data.timestamp));
+            if (dates.length) {
+                const lastDate = new Date(Math.max.apply(null, dates));
+                commit(types.SET_LASTUPDATE, lastDate);
+                window.localStorage.setItem('lastUpdate', lastDate);
+            }
+            const records = changedData.map(item => {
+                item.data.orders.forEach(sub => {
+                    sub._table = item.id;
+                });
+                return item.data.orders;
+            }).reduce((a, b) => a.concat(b), []);
+            const period = changedData.map(item => Object.assign({}, item.data, { game: item.id }));
+            commit(types.GET_PERIOD, period);
+            commit(types.GET_RECORDS, records);
+            window.localStorage.setItem('period', JSON.stringify(period));
+            window.localStorage.setItem('records', JSON.stringify(records));
+            commit(rootTypes.LOADING, false);
+        };
+
+        if (window.localStorage.getItem('players') && window.localStorage.getItem('period') && window.localStorage.getItem('records')) {
+            commit(types.GET_PLAYERS, JSON.parse(window.localStorage.getItem('players')));
+            commit(types.GET_PERIOD, JSON.parse(window.localStorage.getItem('period')));
+            commit(types.GET_RECORDS, JSON.parse(window.localStorage.getItem('records')));
+            if (window.localStorage.getItem('lastUpdate')) {
+                commit(types.SET_LASTUPDATE, window.localStorage.getItem('lastUpdate'));
+            }
+        } else {
+            commit(rootTypes.LOADING, true);
+            Promise.all([
+                    db.collection('players').get().then(snapshot => snapshot.docs.map(doc => doc.id)),
+                    db.collection('games').get().then(snapshot => snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() })))
+                ])
+                .then(res => {
+                    commit(types.GET_PLAYERS, res[0]);
+                    operateGames(res[1]);
+                })
+                .catch(err => {
+                    alert(err);
+                    commit(rootTypes.LOADING, false);
+                });
+        }
 
         let firstQuery = true;
         db.collection('games')
@@ -129,20 +147,7 @@ const actions = {
                 }
                 commit(rootTypes.LOADING, { text: 'New data is coming' });
                 setTimeout(() => {
-                    const changedData = snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }));
-                    const dates = changedData.filter(item => item.data.timestamp).map(item => new Date(item.data.timestamp));
-                    if (dates.length) {
-                        commit(types.SET_LASTUPDATE, new Date(Math.max.apply(null, dates)));
-                    }
-                    const records = changedData.map(item => {
-                        item.data.orders.forEach(sub => {
-                            sub._table = item.id;
-                        });
-                        return item.data.orders;
-                    }).reduce((a, b) => a.concat(b), []);
-                    commit(types.GET_PERIOD, changedData.map(item => Object.assign({}, item.data, { game: item.id })));
-                    commit(types.GET_RECORDS, records);
-                    commit(rootTypes.LOADING, false);
+                    operateGames(snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() })));
                 }, 1000);
             });
     },

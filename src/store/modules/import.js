@@ -6,7 +6,7 @@ import {
 } from '../root';
 import { GET_URL, TEDDY, POST_URL } from "../../constants/index";
 import utils from "../../libs/utils";
-import { db } from "../../firebase";
+import { db, timestamp } from "../../firebase";
 
 const types = {
     GET_WILSON_SHEETS: 'IMPORT/GET_WILSON_SHEETS',
@@ -77,6 +77,7 @@ const actions = {
                         opponent: teddySummary ? teddySummary['對手'] : '',
                         league: teddySummary ? teddySummary['聯盟'] : '',
                         group: teddySummary ? teddySummary['組別'] : '',
+                        timestamp,
                     });
                 });
 
@@ -106,6 +107,7 @@ const actions = {
                     opponent: teddySummary ? teddySummary['對手'] : '',
                     league: teddySummary ? teddySummary['聯盟'] : '',
                     group: teddySummary ? teddySummary['組別'] : '',
+                    timestamp,
                 });
             })
             .then(() => {

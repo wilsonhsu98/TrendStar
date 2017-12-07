@@ -20,6 +20,7 @@ const types = {
     SET_COLS: 'RECORD/SET_COLS',
     DEL_PLAYER: 'RECORD/DEL_PLAYER',
     REFRESH_PLAYER: 'RECORD/REFRESH_PLAYER',
+    SET_LASTUPDATE: 'RECORD/SET_LASTUPDATE',
 };
 
 const state = {
@@ -30,6 +31,7 @@ const state = {
     top: 10,
     hiddenPlayer: [],
     sortBy: 'OPS',
+    lastUpdate: '',
 
     cols: [
         { name: 'Rank', visible: true },
@@ -84,6 +86,7 @@ const getters = {
     displayedCols: state => {
         return state.cols.filter(item => item.visible);
     },
+    lastUpdate: state => state.lastUpdate,
 };
 
 const actions = {
@@ -97,6 +100,10 @@ const actions = {
                 db.collection('games').get().then(snapshot => snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() })))
             ])
             .then(res => {
+                const dates = res[1].filter(item => item.data.timestamp).map(item => new Date(item.data.timestamp));
+                if (dates.length) {
+                    commit(types.SET_LASTUPDATE, new Date(Math.max.apply(null, dates)));
+                }
                 const records = res[1].map(item => {
                     item.data.orders.forEach(sub => {
                         sub._table = item.id;
@@ -113,18 +120,31 @@ const actions = {
                 commit(rootTypes.LOADING, false);
             });
 
+        let firstQuery = true;
         db.collection('games')
             .onSnapshot(snapshot => {
-                const changedData = snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }));
-                const records = changedData.map(item => {
-                    item.data.orders.forEach(sub => {
-                        sub._table = item.id;
-                    });
-                    return item.data.orders;
-                }).reduce((a, b) => a.concat(b), []);
-                commit(types.GET_PERIOD, changedData.map(item => Object.assign({}, item.data, { game: item.id })));
-                commit(types.GET_RECORDS, records);
-            })
+                if (firstQuery) {
+                    firstQuery = false;
+                    return;
+                }
+                commit(rootTypes.LOADING, { text: 'New data is coming' });
+                setTimeout(() => {
+                    const changedData = snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }));
+                    const dates = changedData.filter(item => item.data.timestamp).map(item => new Date(item.data.timestamp));
+                    if (dates.length) {
+                        commit(types.SET_LASTUPDATE, new Date(Math.max.apply(null, dates)));
+                    }
+                    const records = changedData.map(item => {
+                        item.data.orders.forEach(sub => {
+                            sub._table = item.id;
+                        });
+                        return item.data.orders;
+                    }).reduce((a, b) => a.concat(b), []);
+                    commit(types.GET_PERIOD, changedData.map(item => Object.assign({}, item.data, { game: item.id })));
+                    commit(types.GET_RECORDS, records);
+                    commit(rootTypes.LOADING, false);
+                }, 1000);
+            });
     },
     setPeriod({ commit }, value) {
         commit(types.SET_PERIOD, value);
@@ -164,12 +184,19 @@ const mutations = {
     },
     [types.GET_PERIOD](state, data) {
         state.period.find(item => item.period === 'All time').games = data.map(item => item.game);
-        state.period = state.period.concat(
-            data.map(item => item.year + item.season)
-                .filter((value, index, self) => self.indexOf(value) === index)
-                .map(item => ({period: item, games: data.filter(sub => (sub.year + sub.season) === item ).map(sub => sub.game)}))
-                .sort((a, b)=> a.period < b.period)
-        );
+
+        state.period = state.period.filter((value, index, self) => self.map(item => item.period).indexOf(value.period) === index);
+
+        data.map(item => item.year + item.season)
+            .filter((value, index, self) => self.indexOf(value) === index)
+            .map(item => ({period: item, games: data.filter(sub => (sub.year + sub.season) === item ).map(sub => sub.game)}))
+            .sort((a, b)=> a.period < b.period)
+            .forEach(item => {
+                const find = state.period.find(sub => sub.period === item.period);
+                if (!find) {
+                    state.period.push(item);
+                }
+            });
     },
     [types.GET_PLAYERS](state, data) {
         state.players = data;
@@ -216,6 +243,9 @@ const mutations = {
     [types.REFRESH_PLAYER](state) {
         state.hiddenPlayer = [];
         window.localStorage.setItem("pref_hiddenplayer", JSON.stringify(state.hiddenPlayer));
+    },
+    [types.SET_LASTUPDATE](state, date) {
+        state.lastUpdate = date;
     },
 };
 

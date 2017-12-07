@@ -32,6 +32,10 @@
 						 -->{{ col.name }}<!--
 					 --></label>
 				 </div>
+				 <template v-if="lastUpdate">
+					 <div class="condition__label date">Last update:</div>
+					 <div class="condition__element date">{{ new Date(lastUpdate).toLocaleString() }}</div>
+				 </template>
 				 <i class="fa fa-refresh" @click="refreshPlayer"></i>
 			</div>
 		</div>
@@ -63,7 +67,7 @@
 				</div>
 			</template>
 		</div>
-		<loading v-if="loading"></loading>
+		<loading v-if="loading" :text="loading.text"></loading>
 	</div>
 </template>
 
@@ -120,6 +124,7 @@
 		color: $row_color;
 		border: 1px solid $table_bordercolor;
 		position: relative;
+		z-index: 0;
 		.header-row {
 			display: table-row;
 			background: $header_bgcolor;
@@ -159,7 +164,7 @@
 				position: absolute;
 				left: 170px;
 				right: -1px;
-				z-index: 2;
+				z-index: 0;
 
 				display: none;
 
@@ -384,6 +389,9 @@
 					&.col {
 						align-self: start;
 					}
+					&.date {
+						display: none;
+					}
 				}
 				&__element {
 					grid-column: auto / span 4;
@@ -397,6 +405,14 @@
 						align-items: center;
 						justify-items: start;
 						margin-bottom: 4px;
+					}
+					&.date {
+						grid-column: auto / span 6;
+						justify-self: end;
+						padding: 0 10px 10px 0;
+						&:before {
+							content: 'Update: '
+						}
 					}
 				}
 			}
@@ -422,6 +438,9 @@
 					&.col {
 						align-self: start;
 					}
+					&.date {
+						visibility: hidden;
+					}
 				}
 				&__element {
 					grid-column: auto / span 3;
@@ -439,6 +458,14 @@
 						align-items: center;
 						justify-items: start;
 						margin-bottom: 4px;
+					}
+					&.date {
+						grid-column: auto / span 8;
+						justify-self: end;
+						padding: 0 10px 10px 0;
+						&:before {
+							content: 'Last update: '
+						}
 					}
 				}
 			}
@@ -513,6 +540,7 @@
 				list: 'genStatistics',
 				displayedCols: 'displayedCols',
 				loading: 'getLoading',
+				lastUpdate: 'lastUpdate',
 			}),
 		}
 	}

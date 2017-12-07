@@ -11,11 +11,20 @@
 			<div class="sk-cube sk-cube8"></div>
 			<div class="sk-cube sk-cube9"></div>
 		</div>
+		<span v-if="text" class="text">{{ text }}</span>
 	</div>
 </template>
 
 <style lang="scss" scoped>
 	@import "../scss/variable";
+
+	.text {
+		text-align: center;
+		line-height: calc(100vh + 73px);
+		color: #fff;
+		font-size: 24px;
+		display: block;
+	}
 
 	.loading-mask {
 		position: fixed;
@@ -24,7 +33,6 @@
 		bottom: 0;
 		left: 0;
 		background-color: rgba(50, 122, 129, 0.2);
-		// z-index: 1;
 	}
 
 	.sk-cube-grid {
@@ -94,3 +102,14 @@
 	  }
 	}
 </style>
+
+<script>
+	export default {
+		props: ['text'],
+		data() {
+			return {
+				text: this.text,
+			}
+		},
+	};
+</script>

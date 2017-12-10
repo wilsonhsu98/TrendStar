@@ -125,7 +125,7 @@ const actions = {
         } else {
             commit(rootTypes.LOADING, true);
             Promise.all([
-                    db.collection('players').get().then(snapshot => snapshot.docs.map(doc => doc.id)),
+                    db.collection('players').get().then(snapshot => snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }))),
                     db.collection('games').get().then(snapshot => snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() })))
                 ])
                 .then(res => {

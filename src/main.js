@@ -1,10 +1,10 @@
 import Vue from 'vue';
 import store from './store';
 import router from './router';
-import { db } from './firebase';
 
 import './css/font-awesome.min.css';
 import './css/font.css';
+import './scss/_base.scss';
 
 let componentsReq = require.context("./components/", false, /\.vue$/);
 componentsReq.keys().forEach(path => {

@@ -9,8 +9,9 @@ utils.genStatistics = function(players, records, filterPA, filterGames) {
             parseInt(a._table.match(/\d/g).join('') + (a.order + 10), 10)
     });
 
-    return players.map(function(name) {
-        var pa = 0,
+    return players.map(function(player) {
+        var name = player.id,
+            pa = 0,
             ab = 0,
             h = 0,
             tb = 0,
@@ -74,6 +75,7 @@ utils.genStatistics = function(players, records, filterPA, filterGames) {
 
         var obj = {
             name: name,
+            data: player.data,
             records: top,
             PA: '-',
             AB: '-',

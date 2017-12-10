@@ -1,6 +1,7 @@
 <template>
 	<div class="loading-mask">
-		<div class="sk-cube-grid">
+		<div v-if="img" class="logo" :style="`background-image: url(${img})`"></div>
+		<div v-else class="sk-cube-grid">
 			<div class="sk-cube sk-cube1"></div>
 			<div class="sk-cube sk-cube2"></div>
 			<div class="sk-cube sk-cube3"></div>
@@ -24,6 +25,12 @@
 		color: #fff;
 		font-size: 24px;
 		display: block;
+	}
+
+	.logo {
+		background: 50% 50% no-repeat;
+		background-size: 320px auto;
+		height: 100vh;
 	}
 
 	.loading-mask {
@@ -105,10 +112,11 @@
 
 <script>
 	export default {
-		props: ['text'],
+		props: ['text', 'img'],
 		data() {
 			return {
 				text: this.text,
+				img: this.img,
 			}
 		},
 	};

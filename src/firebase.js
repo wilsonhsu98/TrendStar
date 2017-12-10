@@ -10,10 +10,19 @@ const config = {
     // messagingSenderId: "1073012005802",
 };
 firebase.initializeApp(config);
+
 const db = firebase.firestore();
 const timestamp = firebase.firestore.FieldValue.serverTimestamp();
+const provider = new firebase.auth.FacebookAuthProvider();
+// provider.addScope('public_profile');
+// provider.addScope('user_birthday');
+const auth = firebase.auth();
+auth.useDeviceLanguage();
+
 
 export {
     db,
     timestamp,
+    auth,
+    provider,
 };

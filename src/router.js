@@ -6,9 +6,34 @@ Vue.use(VueRouter);
 
 const router = new VueRouter({
     routes: [
-        { path: '/', component: require('./views/app').default },
-        { path: '/parse', component: require('./views/parse-game').default },
-        { path: '*', redirect: '/' }
+        {
+            path: '/login',
+            name: 'login',
+            component: require('./views/page_login').default,
+            meta: { requiresAuth: false },
+        },
+        {
+            path: '/user',
+            name: 'user',
+            component: require('./views/view_user').default,
+            meta: { requiresAuth: true },
+        },
+        {
+            path: '/stats_pa',
+            name: 'stats_pa',
+            component: require('./views/view_stats_pa').default,
+            meta: { requiresAuth: true },
+        },
+        {
+            path: '/parse',
+            name: 'parse',
+            component: require('./views/page_parse').default,
+            meta: { requiresAuth: true },
+        },
+        {
+            path: '*',
+            redirect: '/login',
+        }
     ]
 });
 /*
@@ -53,13 +78,13 @@ const router = new VueRouter({
         }
     ]
 });
-
+*/
 router.beforeEach((to, from, next) => {
-    if (to.matched.some(route => route.meta.requiresAuth) && store.getters.token === '') {
-        next({ path: `login/${encodeURIComponent(to.path)}` });
+    if (to.matched.some(route => route.meta.requiresAuth) && store.getters.userId === '' && store.getters.token === '') {
+        next({ path: 'login' });
     } else {
         next();
     }
 });
-*/
+
 export default router;

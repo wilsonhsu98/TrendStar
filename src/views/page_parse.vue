@@ -16,9 +16,8 @@
 	</div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 	@import "../scss/variable";
-	@import "../scss/base";
 
 	.parse-container {
 		padding: 10px;
@@ -61,7 +60,7 @@
 		computed: {
 			...mapGetters({
 				list: 'getSourceList',
-				loading: 'getLoading'
+				loading: 'loading'
 			})
 		}
 	}

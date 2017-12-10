@@ -46,14 +46,22 @@
 			</div>
 			<template v-for="(item, index) in list">
 				<input type="radio" name="expand" class="toggle-row" @click="toggleRadio($event)"/>
-				<div class="row-grid">
+				<div :class="`row-grid${item.name === userName ? ' current' : ''}`">
 					<span class="cell delete"><i class="fa fa-trash" @click="deletePlayer(item.name)"></i></span>
-					<span
-						:class="`cell${col.name === sortBy ? ' sort' : ''}${['Rank', 'name'].indexOf(col.name) > -1 ? ' ' + col.name : ''}`"
-						v-for="(col, cIndex) in displayedCols"
-						:data-label="col.name">
-						{{ cIndex === 0 ? (index + 1) : formatValue(item[col.name], col.name) }}
-					</span>
+					<template v-for="(col, cIndex) in displayedCols">
+						<span v-if="col.name === 'Rank'" class="cell Rank" data-label="Rank">{{ index + 1 }}</span>
+						<span v-else-if="col.name === 'name'" class="cell name" data-label="name">
+							<span>
+								<span class="img" :style="item.data.img ? `background-image: url(${item.data.img})` : 'border-width: 1px'">
+									<i v-if="!item.data.img" class="fa fa-user-o"></i>
+								</span>
+								{{ item.name }}
+							</span>
+						</span>
+						<span v-else :class="`cell${col.name === sortBy ? ' sort' : ''}`" :data-label="col.name">
+							{{ formatValue(item[col.name], col.name) }}
+						</span>
+					</template>
 					<div v-if="item.listByGame.length" class="cell chart">
 						<div class="chart-inner">
 							<div class="bar" v-for="cube in item.listByGame">
@@ -71,9 +79,8 @@
 	</div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 	@import "../scss/variable";
-	@import "../scss/base";
 
 	.condition {
 		> div, label {
@@ -131,7 +138,11 @@
 			color: $header_color;
 			.cell {
 				&.Rank, &.delete { width: 50px; }
-				&.name { width: 70px; }
+				&.name {
+					width: 100px;
+					padding-left: 0;
+					text-align: center;
+				}
 			}
 		}
 		.toggle-row {
@@ -154,6 +165,7 @@
 			display: table-row;
 			&:nth-child(4n+3) { background-color: $row_even_bgcolor; }
 			&:nth-child(4n+1) { background-color: $row_odd_bgcolor; }
+			&.current { background-color: $current_user_bgcolor; color: $current_user_color; }
 		}
 		.cell {
 			display: table-cell;
@@ -162,7 +174,7 @@
 			&.chart {
 				background-color: #fff;
 				position: absolute;
-				left: 170px;
+				left: 200px;
 				right: -1px;
 				z-index: 0;
 
@@ -203,6 +215,36 @@
 					line-height: 20px;
 					width: 36px;
 					margin: auto;
+				}
+			}
+			&.name {
+				text-align: center;
+				> span {
+					position: relative;
+					padding-left: 36px;
+					text-align: left;
+					line-height: 36px;
+					display: inline-block;
+					width: 100px;
+					box-sizing: border-box;
+					.img {
+						display: inline-block;
+						width: 32px;
+						height: 32px;
+						border: 0 solid $row_color;
+						box-sizing: border-box;
+						border-radius: 50%;
+						background: 50% 50% no-repeat;
+						background-size: 32px auto;
+						position: absolute;
+						top: 2px;
+						left: 0;
+						text-align: center;
+						line-height: 26px;
+						.fa-user-o {
+							font-size: 20px;
+						}
+					}
 				}
 			}
 		}
@@ -296,24 +338,9 @@
 				background-color: #FFF;
 				transition: max-height 1s cubic-bezier(0, 1, 0, 1) -.1s;
 				max-height: 36px;
-				&:nth-child(4n+1) {
-					background-color: $row_odd_bgcolor;
-					// background-color: #FFF;
-					// .cell {
-					// 	&.Rank, &.name, &.sort, &.delete {
-					// 		background-color: $row_odd_bgcolor;
-					// 	}
-					// }
-				}
-				&:nth-child(4n+3) {
-					background-color: $row_even_bgcolor;
-					// background-color: #FFF;
-					// .cell {
-					// 	&.Rank, &.name, &.sort, &.delete {
-					// 		background-color: $row_even_bgcolor;
-					// 	}
-					// }
-				}
+				&:nth-child(4n+1) { background-color: $row_odd_bgcolor; }
+				&:nth-child(4n+3) { background-color: $row_even_bgcolor; }
+				&.current { background-color: $current_user_bgcolor; color: $current_user_color; }
 			}
 			.header-row {
 				display: none;
@@ -486,6 +513,7 @@
 		created () {
 			this.initFromLS();
 			this.fetchTable();
+			console.log(this.list)
 		},
 		mounted() {
 			window.addEventListener('click', this.collapseSearch, true);
@@ -539,8 +567,9 @@
 				conditionCols: 'conditionCols',
 				list: 'genStatistics',
 				displayedCols: 'displayedCols',
-				loading: 'getLoading',
+				loading: 'loading',
 				lastUpdate: 'lastUpdate',
+				userName: 'userName',
 			}),
 		}
 	}

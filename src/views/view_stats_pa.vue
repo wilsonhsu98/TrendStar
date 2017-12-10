@@ -214,7 +214,7 @@
 					&.red { background-color: #ef1010; }
 					&.yellow { background-color: #efaf34; }
 					&.blue { background-color: #4d9de5; }
-					&.exclude { opacity: 0.1; }
+					&.exclude { opacity: 0.3; }
 				}
 				.game {
 					display: block;

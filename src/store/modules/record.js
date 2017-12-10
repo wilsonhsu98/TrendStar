@@ -139,17 +139,29 @@ const actions = {
                 });
         }
 
-        let firstQuery = true;
+        let firstQueryGames = true;
         db.collection('games')
             .onSnapshot(snapshot => {
-                if (firstQuery) {
-                    firstQuery = false;
+                if (firstQueryGames) {
+                    firstQueryGames = false;
                     return;
                 }
                 commit(rootTypes.LOADING, { text: 'New data is coming' });
                 setTimeout(() => {
                     operateGames(snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() })));
                 }, 1000);
+            });
+
+        let firstQueryPlayers = true;
+        db.collection('players')
+            .onSnapshot(snapshot => {
+                if (firstQueryPlayers) {
+                    firstQueryPlayers = false;
+                    return;
+                }
+                const players = snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }));
+                commit(types.GET_PLAYERS, players);
+                window.localStorage.setItem('players', JSON.stringify(players));
             });
     },
     setPeriod({ commit }, value) {

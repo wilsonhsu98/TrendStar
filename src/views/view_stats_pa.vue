@@ -165,7 +165,13 @@
 			display: table-row;
 			&:nth-child(4n+3) { background-color: $row_even_bgcolor; }
 			&:nth-child(4n+1) { background-color: $row_odd_bgcolor; }
-			&.current { background-color: $current_user_bgcolor; color: $current_user_color; }
+			&.current {
+				background-color: $current_user_bgcolor;
+				color: $current_user_color;
+				.cell .img {
+					border-color: $current_user_color;
+				}
+			}
 		}
 		.cell {
 			display: table-cell;
@@ -340,7 +346,13 @@
 				max-height: 36px;
 				&:nth-child(4n+1) { background-color: $row_odd_bgcolor; }
 				&:nth-child(4n+3) { background-color: $row_even_bgcolor; }
-				&.current { background-color: $current_user_bgcolor; color: $current_user_color; }
+				&.current {
+					background-color: $current_user_bgcolor;
+					color: $current_user_color;
+					.cell .img {
+						border-color: $current_user_color;
+					}
+				}
 			}
 			.header-row {
 				display: none;

@@ -36,6 +36,7 @@ const actions = {
         auth.getRedirectResult().then(result => {
                 const user = auth.currentUser;
                 if (user) {
+                    const refPlayers = db.collection("players");
                     commit(types.SET_USERID, user.uid);
                     if (result.credential && result.credential.accessToken) {
                         commit(types.SET_TOKEN, result.credential.accessToken);
@@ -43,12 +44,14 @@ const actions = {
                     if (result.additionalUserInfo && result.additionalUserInfo.isNewUser) {
                         // new user registration & binding account
                         const fbGraphQL = `https://graph.facebook.com/v2.11/me?access_token=${state.token}&fields=name&locale=zh_TW`;
-                        const refPlayers = db.collection("players");
                         axios.get(fbGraphQL).then(res => refPlayers.where("fb", "==", res.data.name).get())
                             .then(snapshot => {
                                 if (snapshot.size) {
                                     commit(types.SET_USERNAME, snapshot.docs[0].id);
-                                    return refPlayers.doc(snapshot.docs[0].id).set({ img: user.photoURL }, { merge: true })
+                                    return refPlayers.doc(snapshot.docs[0].id).set({
+                                        img: user.photoURL,
+                                        userId: user.uid,
+                                    }, { merge: true })
                                 } else {
                                     return;
                                 }
@@ -58,9 +61,17 @@ const actions = {
                                 commit(types.LOADING, false);
                             });
                     } else {
-                        // go to main page
-                        router.push('/stats_pa');
-                        commit(types.LOADING, false);
+                        refPlayers.where("userId", "==", user.uid).get()
+                            .then(snapshot => {
+                                if (snapshot.size) {
+                                    commit(types.SET_USERNAME, snapshot.docs[0].id);
+                                }
+                            })
+                            .then(() => {
+                                // go to main page
+                                router.push('/stats_pa');
+                                commit(types.LOADING, false);
+                            });
                     }
                 } else {
                     // wait for signin
@@ -104,8 +115,7 @@ const mutations = {
         state.userName = userName;
     },
     [types.CLEAN_TOKEN](state) {
-        window.localStorage.removeItem('token');
-        window.localStorage.removeItem('user');
+        window.localStorage.clear();
         state.token = '';
         state.userId = '';
         router.push('/login');

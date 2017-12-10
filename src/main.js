@@ -17,7 +17,7 @@ const app = new Vue({
     router,
 });
 
-const version = 1;
+const version = 2;
 if (window.localStorage.getItem('version') !== version.toString()) {
 	window.localStorage.clear();
 	window.localStorage.setItem('version', version.toString())

@@ -513,7 +513,6 @@
 		created () {
 			this.initFromLS();
 			this.fetchTable();
-			console.log(this.list)
 		},
 		mounted() {
 			window.addEventListener('click', this.collapseSearch, true);

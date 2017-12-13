@@ -1,13 +1,33 @@
 <template>
-	<div>
-		<button @click="fbLogout">
-			fb log out
+	<div class="profile-container">
+		<button class="logout-btn" @click="fbLogout">
+			log out
 		</button>
 	</div>
 </template>
 
 <style lang="scss" scoped>
+	@import "../scss/variable";
 
+	.profile-container {
+		margin: 20px 0;
+	}
+
+	.logout-btn {
+		border-radius: 5px;
+		background-color: $header_bgcolor;
+		color: white;
+		border: 1px solid transparent;
+		padding: 10px 15px;
+		position: relative;
+		top: 50%;
+		&:focus {
+			outline: none;
+		}
+		&:disabled {
+			opacity: .3;
+		}
+	}
 </style>
 
 <script>

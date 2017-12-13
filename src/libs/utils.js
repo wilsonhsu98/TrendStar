@@ -1,7 +1,7 @@
 var utils = exports;
 
 utils.genStatistics = function(players, records, filterPA, filterGames) {
-    filterPA = filterPA || 10;
+    // filterPA = filterPA || 10;
     let sortRecords = JSON.parse(JSON.stringify(records));
 
     sortRecords = sortRecords.sort((a, b) => {
@@ -31,7 +31,6 @@ utils.genStatistics = function(players, records, filterPA, filterGames) {
             .filter(function(item) { return filterGames === undefined || (Array.isArray(filterGames) && filterGames.length === 0) ? true : filterGames.indexOf(item._table) > -1; })
             .filter(function(item) { return item.name === name })
             .slice(0, filterPA);
-
 
         let limit = 1;
         var games = top

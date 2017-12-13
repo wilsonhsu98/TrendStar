@@ -15,6 +15,7 @@ const types = {
     GET_RECORDS: 'RECORD/GET_RECORDS',
     SET_PERIOD: 'RECORD/SET_PERIOD',
     SET_TOP: 'RECORD/SET_TOP',
+    SET_UNLIMITED_PA: 'RECORD/SET_UNLIMITED_PA',
     SET_SORTBY: 'RECORD/SET_SORTBY',
     SET_CHECKALL: 'RECORD/SET_CHECKALL',
     SET_COLS: 'RECORD/SET_COLS',
@@ -27,12 +28,11 @@ const state = {
     players: [],
     records: [],
     period: [{ period: 'All time', select: true }],
-
     top: 10,
+    unlimitedPA: false,
     hiddenPlayer: [],
     sortBy: 'OPS',
     lastUpdate: '',
-
     cols: [
         { name: 'Rank', visible: true },
         { name: 'name', visible: true },
@@ -64,6 +64,7 @@ const getters = {
         return state.period.find(item => item.select).period;
     },
     top: state => state.top,
+    unlimitedPA: state => state.unlimitedPA,
     sortBy: state => state.sortBy,
     checkAll: state => {
         return state.cols.filter(item => item.name !== 'Rank' && item.name !== 'name' && item.visible).length ===
@@ -79,8 +80,8 @@ const getters = {
             }));
     },
     genStatistics: state => {
-        return utils.genStatistics(state.players, state.records, state.top, state.period.find(item => item.select).games)
-            .filter(item => item.PA !== '-' && item.PA === state.top && state.hiddenPlayer.indexOf(item.name) === -1)
+        return utils.genStatistics(state.players, state.records, state.unlimitedPA ? undefined : state.top, state.period.find(item => item.select).games)
+            .filter(item => item.PA !== '-' && (state.unlimitedPA || item.PA === state.top) && state.hiddenPlayer.indexOf(item.name) === -1)
             .sort((a, b) => b[state.sortBy] - a[state.sortBy]);
     },
     displayedCols: state => {
@@ -94,7 +95,7 @@ const actions = {
         commit(types.INIT_FROM_LS);
     },
     fetchTable({ commit }, tableName) {
-        const operateGames = function(changedData) {
+        const operateGames = (changedData) => {
             const dates = changedData.filter(item => item.data.timestamp).map(item => new Date(item.data.timestamp));
             if (dates.length) {
                 const lastDate = new Date(Math.max.apply(null, dates));
@@ -112,7 +113,10 @@ const actions = {
             commit(types.GET_RECORDS, records);
             window.localStorage.setItem('period', JSON.stringify(period));
             window.localStorage.setItem('records', JSON.stringify(records));
-            commit(rootTypes.LOADING, false);
+        };
+        const operatePlayers = (players) => {
+            commit(types.GET_PLAYERS, players);
+            window.localStorage.setItem('players', JSON.stringify(players));
         };
 
         if (window.localStorage.getItem('players') && window.localStorage.getItem('period') && window.localStorage.getItem('records')) {
@@ -122,46 +126,46 @@ const actions = {
             if (window.localStorage.getItem('lastUpdate')) {
                 commit(types.SET_LASTUPDATE, window.localStorage.getItem('lastUpdate'));
             }
-        } else {
-            commit(rootTypes.LOADING, true);
-            Promise.all([
-                    db.collection('players').get().then(snapshot => snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }))),
-                    db.collection('games').get().then(snapshot => snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() })))
-                ])
-                .then(res => {
-                    commit(types.GET_PLAYERS, res[0]);
-                    window.localStorage.setItem('players', JSON.stringify(res[0]));
-                    operateGames(res[1]);
-                })
-                .catch(err => {
-                    alert(err);
-                    commit(rootTypes.LOADING, false);
-                });
         }
-
-        let firstQueryGames = true;
+        commit(rootTypes.LOADING, true);
+        let queryCount = 0;
+        const realtimeCount = 2;
         db.collection('games')
             .onSnapshot(snapshot => {
-                if (firstQueryGames) {
-                    firstQueryGames = false;
-                    return;
-                }
-                commit(rootTypes.LOADING, { text: 'New data is coming' });
-                setTimeout(() => {
+                queryCount += 1;
+                if (queryCount > realtimeCount) {
+                    // realtime
+                    commit(rootTypes.LOADING, { text: 'New data is coming' });
+                    setTimeout(() => {
+                        operateGames(snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() })));
+                        commit(rootTypes.LOADING, false);
+                    }, 1000);
+                } else {
+                    // first time
                     operateGames(snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() })));
-                }, 1000);
+                    if (queryCount === realtimeCount) {
+                        commit(rootTypes.LOADING, false);
+                    }
+                }
             });
-
-        let firstQueryPlayers = true;
         db.collection('players')
             .onSnapshot(snapshot => {
-                if (firstQueryPlayers) {
-                    firstQueryPlayers = false;
-                    return;
+                queryCount += 1;
+                if (queryCount > realtimeCount) {
+                    // realtime
+                    commit(rootTypes.LOADING, { text: 'New data is coming' });
+                    setTimeout(() => {
+                        operatePlayers(snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() })));
+                        commit(rootTypes.LOADING, false);
+                    }, 1000);
+                } else {
+                    // first time
+                    operatePlayers(snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() })));
+                    if (queryCount === realtimeCount) {
+                        commit(rootTypes.LOADING, false);
+                    }
                 }
-                const players = snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }));
-                commit(types.GET_PLAYERS, players);
-                window.localStorage.setItem('players', JSON.stringify(players));
+
             });
     },
     setPeriod({ commit }, value) {
@@ -169,6 +173,9 @@ const actions = {
     },
     setTop({ commit }, value) {
         commit(types.SET_TOP, value);
+    },
+    setUnlimitedPA({ commit }, value) {
+        commit(types.SET_UNLIMITED_PA, value);
     },
     setSortBy({ commit }, value) {
         commit(types.SET_SORTBY, value);
@@ -191,6 +198,7 @@ const actions = {
 const mutations = {
     [types.INIT_FROM_LS](state) {
         state.top = parseInt(window.localStorage.getItem("pref_top"), 10) || state.top;
+        state.unlimitedPA = window.localStorage.getItem("pref_unlimited_pa") || state.unlimitedPA;
         state.sortBy = window.localStorage.getItem("pref_sortby") || state.sortBy;
 
         const pref_period = window.localStorage.getItem("pref_period");
@@ -236,6 +244,10 @@ const mutations = {
     [types.SET_TOP](state, value) {
         state.top = value;
         window.localStorage.setItem("pref_top", state.top);
+    },
+    [types.SET_UNLIMITED_PA](state, value) {
+        state.unlimitedPA = value;
+        window.localStorage.setItem("pref_unlimited_pa", state.unlimitedPA);
     },
     [types.SET_SORTBY](state, value) {
         state.sortBy = value;

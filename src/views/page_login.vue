@@ -17,11 +17,10 @@
 	}
 	.signin-btn {
 		border-radius: 5px;
-		border-color: $header_bgcolor;
 		background-color: $header_bgcolor;
 		color: white;
-		border: 1px solid;
-		padding: 10px 20px;
+		border: 1px solid transparent;
+		padding: 10px 15px;
 		position: relative;
 		top: 50%;
 		&:focus {

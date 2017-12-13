@@ -1,7 +1,10 @@
+html {
+	background-color: #e9e9e9;
+}
 body {
 	margin: 0;
 	font-family: 'Inconsolata', '微軟正黑體';
-	padding: 10px;
+	// overflow-y: scroll;
 }
 
 input[type=number]::-webkit-inner-spin-button,
@@ -29,7 +32,5 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 @media only screen and (max-width: 760px) {
-	body {
-		padding: 0;
-	}
+
 }

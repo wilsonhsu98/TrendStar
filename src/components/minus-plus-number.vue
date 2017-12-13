@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div style="display: inline-block;" :class="`${disabled ? 'disabled' : ''}`">
 		<div class="dec button" @click="minus"></div><!--
 		--><input type="number" class="input" v-model.number="num" min="1"><!--
 		--><div class="inc button" @click="plus"></div>
@@ -7,6 +7,12 @@
 </template>
 
 <style lang="scss" scoped>
+	.disabled {
+		.input,
+		.button {
+			opacity: 0.5;
+		}
+	}
 	.input {
 		width: 44px;
 		padding: 3px 0 0 0;
@@ -69,15 +75,23 @@
 
 <script>
 	export default {
-		props: ['value'],
+		props: ['value', 'disabled'],
 		data() {
 			return {
-				val: this.value
+				val: this.value,
 			}
 		},
 		methods: {
-			plus() { this.val += 1; },
-			minus() { this.val -= this.val > 1 ? 1 : 0; }
+			plus() {
+				if (!this.disabled) {
+					this.val += 1;
+				}
+			},
+			minus() {
+				if (!this.disabled) {
+					this.val -= this.val > 1 ? 1 : 0;
+				}
+			},
 		},
 		computed: {
 			num: {
@@ -86,7 +100,7 @@
 				},
 				set: function(newValue) {
 					this.val = newValue || 1;
-				}
+				},
 			}
 		},
 		watch: {

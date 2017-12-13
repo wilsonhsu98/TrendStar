@@ -28,10 +28,9 @@
 	}
 	.parse-btn {
 		border-radius: 5px;
-		border-color: $header_bgcolor;
 		background-color: $header_bgcolor;
 		color: white;
-		border: 1px solid;
+		border: 1px solid transparent;
 		padding: 10px 20px;
 		&:focus {
 			outline: none;

@@ -10,15 +10,19 @@
 						<option v-for="item in period">{{ item.period }}</option>
 					</select>
 				</div>
-				<div class="condition__label">Latest PA:</div>
-				<div class="condition__element">
-					 <minus-plus-number :value="top" @change="setTop"/>
-				</div>
 				<div class="condition__label">Sort by:</div>
-				<div class="condition__element sort">
+				<div class="condition__element">
 					<select class="dropdown" :value="sortBy" @change="setSortBy($event.target.value)">
 						<option v-for="col in conditionCols">{{ col.name }}</option>
 					</select>
+				</div>
+				<div class="condition__label">Latest PA:</div>
+				<div class="condition__element pa">
+					<minus-plus-number :value="top" :disabled="unlimitedPA" @change="setTop"/>
+					<label for="unlimited_pa"><!--
+					 	 --><input id="unlimited_pa" type="checkbox" :checked="unlimitedPA" @change="setUnlimitedPA($event.target.checked)"/><!--
+					 	  -->Unlimited<!--
+				 	 --></label>
 				</div>
 				<br>
 				<div class="condition__label col">Display:</div>
@@ -83,11 +87,18 @@
 	@import "../scss/variable";
 
 	.condition {
+		background-color: #fff;
+		border-radius: 10px;
+		margin: 20px 0;
+		padding: 20px;
 		> div, label {
 			display: inline-block;
 			line-height: 30px;
 			height: 30px;
 			vertical-align: middle;
+		}
+		label {
+			cursor: pointer;
 		}
 		&__label {
 			padding: 0 4px;
@@ -105,7 +116,6 @@
 		&__col {
 			margin-right: 10px;
 			vertical-align: middle;
-			cursor: pointer;
 		}
 	}
 
@@ -129,7 +139,7 @@
 		margin: 0;
 		box-sizing: border-box;
 		color: $row_color;
-		border: 1px solid $table_bordercolor;
+		// border: 1px solid $table_bordercolor;
 		position: relative;
 		z-index: 0;
 		.header-row {
@@ -137,7 +147,7 @@
 			background: $header_bgcolor;
 			color: $header_color;
 			.cell {
-				&.Rank, &.delete { width: 50px; }
+				&.Rank, &.delete { width: 45px; }
 				&.name {
 					width: 100px;
 					padding-left: 0;
@@ -180,16 +190,17 @@
 			&.chart {
 				background-color: #fff;
 				position: absolute;
-				left: 200px;
-				right: -1px;
-				z-index: 0;
+				left: 190px;
+				right: 0;
+				z-index: 2;
 
 				display: none;
 
 				font-size: 12px;
 				margin-top: 36px;
+				margin-bottom: 20px;
 				padding-top: 5px;
-				border: 1px solid $table_bordercolor;
+				// border: 1px solid $table_bordercolor;
 				border-top: 0;
 				box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 				.chart-inner {
@@ -225,6 +236,7 @@
 			}
 			&.name {
 				text-align: center;
+				&:first-letter { text-transform:uppercase; }
 				> span {
 					position: relative;
 					padding-left: 36px;
@@ -298,6 +310,9 @@
 				}
 			}
 			.condition {
+				background-color: transparent;
+				border-radius: 0;
+				margin: 0;
 				max-height: 0;
 				transition: max-height .5s cubic-bezier(0, 1, 0, 1) -.1s;
 				display: grid;
@@ -483,7 +498,7 @@
 				}
 				&__element {
 					grid-column: auto / span 3;
-					&.sort {
+					&.pa {
 						grid-column: auto / span 8;
 					}
 					&.col {
@@ -523,8 +538,6 @@
 			};
 		},
 		created () {
-			this.initFromLS();
-			this.fetchTable();
 		},
 		mounted() {
 			window.addEventListener('click', this.collapseSearch, true);
@@ -534,10 +547,9 @@
 		},
 		methods: {
 			...mapActions([
-				'initFromLS',
-				'fetchTable',
 				'setPeriod',
 				'setTop',
+				'setUnlimitedPA',
 				'setSortBy',
 				'setCheckAll',
 				'toggleColumn',
@@ -573,6 +585,7 @@
 				period: 'period',
 				periodSelect: 'periodSelect',
 				top: 'top',
+				unlimitedPA: 'unlimitedPA',
 				sortBy: 'sortBy',
 				checkAll: 'checkAll',
 				conditionCols: 'conditionCols',

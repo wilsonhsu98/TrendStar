@@ -1,6 +1,6 @@
 <template>
 	<div class="loading-mask">
-		<div v-if="img" class="logo" :style="`background-image: url(${img})`"></div>
+		<div v-if="img" class="logo"></div>
 		<div v-else class="sk-cube-grid">
 			<div class="sk-cube sk-cube1"></div>
 			<div class="sk-cube sk-cube2"></div>
@@ -28,7 +28,7 @@
 	}
 
 	.logo {
-		background: 50% 50% no-repeat;
+		background: url(../images/icon.png) 50% 50% no-repeat;
 		background-size: 320px auto;
 		height: 100vh;
 	}

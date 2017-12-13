@@ -32,7 +32,7 @@ const actions = {
         auth.signInWithRedirect(provider);
     },
     chkLoginStatus({ commit }) {
-        commit(types.LOADING, { img: require('../images/icon.png') });
+        commit(types.LOADING, { img: true });
         auth.getRedirectResult().then(result => {
                 const user = auth.currentUser;
                 if (user) {
@@ -57,7 +57,7 @@ const actions = {
                                 }
                             })
                             .then(() => {
-                                router.push('/stats_pa');
+                                router.push('/main/stats_pa');
                                 commit(types.LOADING, false);
                             });
                     } else {
@@ -69,7 +69,7 @@ const actions = {
                             })
                             .then(() => {
                                 // go to main page
-                                router.push('/stats_pa');
+                                router.push('/main/stats_pa');
                                 commit(types.LOADING, false);
                             });
                     }

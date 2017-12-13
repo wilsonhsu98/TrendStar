@@ -39,6 +39,7 @@
 		background-color: $header_bgcolor;
 		height: $header_menu_height;
 		.tab {
+			box-sizing: border-box;
 			list-style-type: none;
 			padding: 0;
 			margin: 0 auto;
@@ -89,8 +90,8 @@
 
 			height: $footer_menu_height;
 			line-height: $footer_menu_height;
-			top: calc(100vh - #{$footer_menu_height});
-
+			bottom: 0;
+			top: initial;
 			.tab {
 				display: flex;
 				justify-content:space-around;

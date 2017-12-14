@@ -31,7 +31,8 @@ let config = {
 			loader: 'url-loader',
 			options: {
 				limit: 7000,
-				name: 'assets/images/[name].[ext]'
+				name: 'assets/images/[name].[ext]',
+				publicPath: __PROD__ ? '../../' : '/'
 			}
 		}, {
 			test: /\.(ico)$/,

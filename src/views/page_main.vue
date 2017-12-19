@@ -3,6 +3,11 @@
 		<header>
 			<ul class="tab">
 				<li>
+					<router-link :to="{ name: 'games' }" active-class="active" data-label="Games">
+						<i class="fa fa-table"></i>
+					</router-link>
+				</li>
+				<li>
 					<router-link :to="{ name: 'stats_pa' }" active-class="active" data-label="Stats">
 						<i class="fa fa-list-ol"></i>
 					</router-link>

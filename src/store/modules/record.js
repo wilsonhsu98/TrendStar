@@ -22,6 +22,7 @@ const types = {
     DEL_PLAYER: 'RECORD/DEL_PLAYER',
     REFRESH_PLAYER: 'RECORD/REFRESH_PLAYER',
     SET_LASTUPDATE: 'RECORD/SET_LASTUPDATE',
+    SET_GAME: 'RECORD/SET_GAME',
 };
 
 const state = {
@@ -56,6 +57,7 @@ const state = {
         { name: 'SLG', visible: true },
         { name: 'OPS', visible: true }
     ],
+    game: '',
 };
 
 const getters = {
@@ -88,13 +90,19 @@ const getters = {
         return state.cols.filter(item => item.visible);
     },
     lastUpdate: state => state.lastUpdate,
+    box: state => {
+        return utils.displayGame(state.records.filter(item => item._table === state.game));
+    },
+    games: state => {
+        return state.period.find(item => item.period === 'All time').games;
+    },
 };
 
 const actions = {
     initFromLS({ commit }) {
         commit(types.INIT_FROM_LS);
     },
-    fetchTable({ commit }, tableName) {
+    fetchTable({ commit }) {
         const operateGames = (changedData) => {
             const dates = changedData.filter(item => item.data.timestamp).map(item => new Date(item.data.timestamp));
             if (dates.length) {
@@ -193,6 +201,9 @@ const actions = {
     refreshPlayer({ commit }) {
         commit(types.REFRESH_PLAYER);
     },
+    setGame({ commit }, gemeDate) {
+        commit(types.SET_GAME, gemeDate);
+    },
 };
 
 const mutations = {
@@ -209,7 +220,9 @@ const mutations = {
         if (pref_hiddenplayer) state.hiddenPlayer = JSON.parse(pref_hiddenplayer);
     },
     [types.GET_PERIOD](state, data) {
-        state.period.find(item => item.period === 'All time').games = data.map(item => item.game);
+        state.period.find(item => item.period === 'All time').games = data.map(item => item.game).sort((a, b) => {
+            return parseInt(b.match(/\d/g).join(''), 10) - parseInt(a.match(/\d/g).join(''), 10)
+        });
 
         state.period = state.period.filter((value, index, self) => self.map(item => item.period).indexOf(value.period) === index);
 
@@ -276,6 +289,9 @@ const mutations = {
     },
     [types.SET_LASTUPDATE](state, date) {
         state.lastUpdate = date;
+    },
+    [types.SET_GAME](state, data) {
+        state.game = data;
     },
 };
 

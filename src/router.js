@@ -25,6 +25,16 @@ const router = new VueRouter({
             meta: { requiresAuth: true },
             children: [
                 {
+                    path: 'games',
+                    name: 'games',
+                    component: require('./views/view_games').default,
+                    meta: { requiresAuth: true },
+                }, {
+                    path: 'game/:game',
+                    name: 'game',
+                    component: require('./views/view_game').default,
+                    meta: { requiresAuth: true },
+                }, {
                     path: 'stats_pa',
                     name: 'stats_pa',
                     component: require('./views/view_stats_pa').default,

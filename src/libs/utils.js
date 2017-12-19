@@ -187,3 +187,74 @@ utils.parseGame = function(arr) {
         return item;
     });
 };
+
+utils.displayGame = function(records) {
+    var arr = [],
+        order = 0,
+        inn = 0,
+        innChange = 0,
+        contentColor = (content) => {
+            let color = 'blue';
+            if (['1H', '2H', '3H', 'HR'].indexOf(content) > -1) color = 'red';
+            if (['BB', '犧飛'].indexOf(content) > -1) color = 'yellow';
+            return color;
+        };
+    records.map((item, i, self) => {
+            const find = arr.find(sub => sub.name === item.name);
+            if (!find && order === 0) {
+                arr.push({name: item.name, order: item.order, content: []});
+            } else {
+                if (order === 0) {
+                    order = item.order - find.order;
+                }
+            }
+            if (self.length - 1 === i) {
+                inn = item.inn;
+            }
+            return item;
+        }).forEach(item => {
+            if (item.inn !== innChange) {
+                innChange = item.inn;
+                item.innChange = item.inn;
+            }
+            let index = -1;
+            const find = arr.find(sub => sub.name === item.name);
+            if (find) {
+                let middleArr = [];
+                middleArr.length = Math.ceil(item.order / order - 1) - find.content.length;
+                item.color = contentColor(item.content);
+                find.content = find.content.concat(middleArr, item);
+            } else {
+                index = -1;
+                arr.forEach((sub, i) => {
+                    if (sub.altOrder && sub.altOrder === (item.order % order || order)) {
+                        index = i;
+                    } else if (sub.order === (item.order % order || order)) {
+                        index = i;
+                    }
+                });
+                if (index > -1) {
+                    let addArr = [];
+                    addArr.length = parseInt(item.order / order, 10);
+                    item.color = contentColor(item.content);
+                    addArr.push(item);
+                    arr.splice(index + 1, 0, {name: item.name, order: item.order, altOrder: item.order % order || order, content: addArr});
+                }
+            }
+            index = -1;
+            arr.forEach((sub, i) => {
+                if (sub.altOrder && sub.altOrder === (item.order % order || order)) {
+                    index = i;
+                } else if (sub.order === (item.order % order || order)) {
+                    index = i;
+                }
+            });
+            if (item.r && item.r !== item.name && index > -1) {
+                let addArr = [];
+                addArr.length = parseInt(item.order / order, 10);
+                addArr.push({inn: item.inn, name: item.r, order: item.order, r: item.r, color: 'gray', content: '代跑'});
+                arr.splice(index + 1, 0, {name: item.r, order: item.order, 'altOrder': item.order % order || order, content: addArr});
+            }
+        });
+    return arr;
+};

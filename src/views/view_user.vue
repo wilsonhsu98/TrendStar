@@ -11,6 +11,7 @@
 
 	.profile-container {
 		margin: 20px 0;
+		text-align: center;
 	}
 
 	.logout-btn {

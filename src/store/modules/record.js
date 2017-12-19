@@ -91,7 +91,7 @@ const getters = {
     },
     lastUpdate: state => state.lastUpdate,
     box: state => {
-        return utils.displayGame(state.records.filter(item => item._table === state.game));
+        return utils.displayGame(state.players, state.records.filter(item => item._table === state.game));
     },
     games: state => {
         return state.period.find(item => item.period === 'All time').games;

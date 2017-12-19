@@ -188,7 +188,7 @@ utils.parseGame = function(arr) {
     });
 };
 
-utils.displayGame = function(records) {
+utils.displayGame = function(players, records) {
     var arr = [],
         order = 0,
         inn = 0,
@@ -202,7 +202,12 @@ utils.displayGame = function(records) {
     records.map((item, i, self) => {
             const find = arr.find(sub => sub.name === item.name);
             if (!find && order === 0) {
-                arr.push({name: item.name, order: item.order, content: []});
+                arr.push({
+                    name: item.name,
+                    data: (players.find(sub => sub.id === item.name) || {data: {}}).data,
+                    order: item.order,
+                    content: [],
+                });
             } else {
                 if (order === 0) {
                     order = item.order - find.order;
@@ -217,14 +222,16 @@ utils.displayGame = function(records) {
                 innChange = item.inn;
                 item.innChange = item.inn;
             }
+            item.color = contentColor(item.content);
+
             let index = -1;
             const find = arr.find(sub => sub.name === item.name);
             if (find) {
                 let middleArr = [];
                 middleArr.length = Math.ceil(item.order / order - 1) - find.content.length;
-                item.color = contentColor(item.content);
                 find.content = find.content.concat(middleArr, item);
             } else {
+                // Handle 代打
                 index = -1;
                 arr.forEach((sub, i) => {
                     if (sub.altOrder && sub.altOrder === (item.order % order || order)) {
@@ -234,13 +241,18 @@ utils.displayGame = function(records) {
                     }
                 });
                 if (index > -1) {
-                    let addArr = [];
-                    addArr.length = parseInt(item.order / order, 10);
-                    item.color = contentColor(item.content);
-                    addArr.push(item);
-                    arr.splice(index + 1, 0, {name: item.name, order: item.order, altOrder: item.order % order || order, content: addArr});
+                    let middleArr = [];
+                    middleArr.length = Math.ceil(item.order / order - 1);
+                    arr.splice(index + 1, 0, {
+                        name: item.name,
+                        data: (players.find(sub => sub.id === item.name) || {data: {}}).data,
+                        order: item.order,
+                        altOrder: item.order % order || order,
+                        content: [].concat(middleArr, item),
+                    });
                 }
             }
+            // Handle 代跑
             index = -1;
             arr.forEach((sub, i) => {
                 if (sub.altOrder && sub.altOrder === (item.order % order || order)) {
@@ -250,11 +262,37 @@ utils.displayGame = function(records) {
                 }
             });
             if (item.r && item.r !== item.name && index > -1) {
-                let addArr = [];
-                addArr.length = parseInt(item.order / order, 10);
-                addArr.push({inn: item.inn, name: item.r, order: item.order, r: item.r, color: 'gray', content: '代跑'});
-                arr.splice(index + 1, 0, {name: item.r, order: item.order, 'altOrder': item.order % order || order, content: addArr});
+                let middleArr = [];
+                middleArr.length = Math.ceil(item.order / order - 1);
+                arr.splice(index + 1, 0, {
+                    name: item.r,
+                    data: (players.find(sub => sub.id === item.r) || {data: {}}).data,
+                    order: item.order,
+                    altOrder: item.order % order || order,
+                    content: [].concat(middleArr, {
+                        inn: item.inn,
+                        name: item.r,
+                        order: item.order,
+                        r: item.r,
+                        color: 'gray',
+                        content: '代跑',
+                    }),
+                });
             }
         });
+    let paMax = 0;
+    arr.forEach(item => {
+        if (item.content.length > paMax) paMax = item.content.length;
+    });
+    arr.forEach(item => {
+        let ab = 0;
+        let h = 0;
+        item.content.forEach(sub => {
+            ab += ['1H', '2H', '3H', 'HR', '飛球', '滾地', 'K', 'E', '野選', '雙殺'].indexOf(sub.content) > -1 ? 1 : 0;
+            h += ['1H', '2H', '3H', 'HR'].indexOf(sub.content) > -1 ? 1 : 0;
+        });
+        item.content.length = paMax;
+        item.summary = `${ab}-${h}`;
+    });
     return arr;
 };

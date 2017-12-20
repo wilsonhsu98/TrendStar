@@ -1,27 +1,30 @@
 <template>
-	<div class="gamebox-container">
-		<div class="player-records" v-for="item in box">
-			<div class="player">
-				<span class="order">{{ item.altOrder ? '代': item.order }}</span><!--
-				 --><span class="name">
-				 		<span class="img" :style="item.data.img ? `background-image: url(${item.data.img})` : 'border-width: 1px'">
-							<i v-if="!item.data.img" class="fa fa-user-o"></i>
-						</span>
-						{{ item.name }}
-					</span><!--
-				 --><span class="alt"></span>
-			</div><!--
-			 --><div class="records">
-			 		<template v-for="record in item.content">
-						<div class="record" v-if="record === undefined"></div>
-						<div class="record" v-else>
-							<span class="inn">{{ record.innChange }}</span><!--
-							 --><span :class="`content ${record.color} ${record.rbi ? 'rbi' : ''} ${record.r === record.name ? 'run' : ''}`" :data-rbi="record.rbi" :data-run="`${record.r === record.name ? 'R' : ''}`">{{ record.content }}</span>
-						</div>
-					</template>
-				</div>
-			<span class="summary">{{ item.summary }}</span>
+	<div>
+		<div class="gamebox-container">
+			<div class="player-records" v-for="item in box">
+				<div class="player">
+					<span class="order">{{ item.altOrder ? '代': item.order }}</span><!--
+					 --><span class="name">
+							<span class="img" :style="item.data.img ? `background-image: url(${item.data.img})` : 'border-width: 1px'">
+								<i v-if="!item.data.img" class="fa fa-user-o"></i>
+							</span>
+							{{ item.name }}
+						</span><!--
+					 --><span class="alt"></span>
+				</div><!--
+				 --><div class="records">
+						<template v-for="record in item.content">
+							<div class="record" v-if="record === undefined"></div>
+							<div class="record" v-else>
+								<span class="inn">{{ record.innChange }}</span><!--
+								 --><span :class="`content ${record.color} ${record.rbi ? 'rbi' : ''} ${record.r === record.name ? 'run' : ''}`" :data-rbi="record.rbi" :data-run="`${record.r === record.name ? 'R' : ''}`">{{ record.content }}</span>
+							</div>
+						</template>
+					</div>
+				<span class="summary">{{ item.summary }}</span>
+			</div>
 		</div>
+		<loading v-if="loading" :text="loading.text"></loading>
 	</div>
 </template>
 
@@ -172,7 +175,7 @@
 				}
 				.summary {
 					flex-basis: 26px;
-					padding-right: 5px;
+					padding: 0 5px;
 				}
 			}
 
@@ -207,7 +210,8 @@
 		},
 		computed: {
 			...mapGetters({
-				box: 'box'
+				box: 'box',
+				loading: 'loading',
 			})
 		}
 	}

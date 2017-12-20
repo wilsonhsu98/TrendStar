@@ -72,6 +72,13 @@ utils.genStatistics = function(players, records, filterPA, filterGames) {
             dp += item.content === '雙殺' ? 1 : 0;
         });
 
+        if (filterPA === undefined) {
+            r += sortRecords
+                .filter(function(item) { return item.r === name && item.name !== name})
+                .filter(function(item) { return filterGames === undefined || (Array.isArray(filterGames) && filterGames.length === 0) ? true : filterGames.indexOf(item._table) > -1; })
+                .length;
+        }
+
         var obj = {
             name: name,
             data: player.data,
@@ -295,4 +302,19 @@ utils.displayGame = function(players, records) {
         item.summary = `${ab}-${h}`;
     });
     return arr;
+};
+
+utils.genGameList = function(games) {
+    const temp = games.map(item => item.game.substr(0, 8))
+        .filter((v, i, self) => self.indexOf(v) === i)
+        .sort((a, b) => {
+            return parseInt(b.match(/\d/g).join(''), 10) - parseInt(a.match(/\d/g).join(''), 10)
+        })
+        .map(item => {
+            return {
+                date: item,
+                games: games.filter(sub => sub.game.substr(0, 8) === item),
+            }
+        });
+    return temp;
 };

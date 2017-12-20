@@ -23,6 +23,7 @@ const types = {
     REFRESH_PLAYER: 'RECORD/REFRESH_PLAYER',
     SET_LASTUPDATE: 'RECORD/SET_LASTUPDATE',
     SET_GAME: 'RECORD/SET_GAME',
+    GET_GAMELIST: 'RECORD/GET_GAMELIST',
 };
 
 const state = {
@@ -58,6 +59,7 @@ const state = {
         { name: 'OPS', visible: true }
     ],
     game: '',
+    gameList: [],
 };
 
 const getters = {
@@ -93,9 +95,7 @@ const getters = {
     box: state => {
         return utils.displayGame(state.players, state.records.filter(item => item._table === state.game));
     },
-    games: state => {
-        return state.period.find(item => item.period === 'All time').games;
-    },
+    gameList: state => state.gameList,
 };
 
 const actions = {
@@ -110,15 +110,19 @@ const actions = {
                 commit(types.SET_LASTUPDATE, lastDate);
                 window.localStorage.setItem('lastUpdate', lastDate);
             }
-            const records = changedData.map(item => {
+            const records = changedData.filter(item => item.data.orders).map(item => {
                 item.data.orders.forEach(sub => {
                     sub._table = item.id;
                 });
                 return item.data.orders;
             }).reduce((a, b) => a.concat(b), []);
-            const period = changedData.map(item => Object.assign({}, item.data, { game: item.id }));
+            const period = changedData.map(item => {
+                delete item.data.orders;
+                return Object.assign({}, item.data, { game: item.id });
+            });
             commit(types.GET_PERIOD, period);
             commit(types.GET_RECORDS, records);
+            commit(types.GET_GAMELIST, period);
             window.localStorage.setItem('period', JSON.stringify(period));
             window.localStorage.setItem('records', JSON.stringify(records));
         };
@@ -131,6 +135,7 @@ const actions = {
             commit(types.GET_PLAYERS, JSON.parse(window.localStorage.getItem('players')));
             commit(types.GET_PERIOD, JSON.parse(window.localStorage.getItem('period')));
             commit(types.GET_RECORDS, JSON.parse(window.localStorage.getItem('records')));
+            commit(types.GET_GAMELIST, JSON.parse(window.localStorage.getItem('period')));
             if (window.localStorage.getItem('lastUpdate')) {
                 commit(types.SET_LASTUPDATE, window.localStorage.getItem('lastUpdate'));
             }
@@ -292,6 +297,9 @@ const mutations = {
     },
     [types.SET_GAME](state, data) {
         state.game = data;
+    },
+    [types.GET_GAMELIST](state, data) {
+        state.gameList = utils.genGameList(data);
     },
 };
 

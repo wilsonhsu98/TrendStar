@@ -1,7 +1,7 @@
 <template>
 	<div style="display: inline-block;" :class="`${disabled ? 'disabled' : ''}`">
 		<div class="dec button" @click="minus"></div><!--
-		--><input type="number" class="input" v-model.number="num" min="1"><!--
+		--><input type="number" class="input" v-model.number="num" min="1" :disabled="disabled"><!--
 		--><div class="inc button" @click="plus"></div>
 	</div>
 </template>

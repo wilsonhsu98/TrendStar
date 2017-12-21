@@ -1,5 +1,6 @@
 <template>
 	<div class="profile-container">
+		<mobile-header></mobile-header>
 		<button class="logout-btn" @click="fbLogout">
 			log out
 		</button>
@@ -27,6 +28,12 @@
 		}
 		&:disabled {
 			opacity: .3;
+		}
+	}
+
+	@media only screen and (max-width: 760px) {
+		.profile-container {
+			padding: 60px 0 0;
 		}
 	}
 </style>

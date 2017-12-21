@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<mobile-header></mobile-header>
 		<div class="gamebox-container">
 			<div class="player-records" v-for="item in box">
 				<div class="player">
@@ -135,7 +136,7 @@
 	}
 	@media only screen and (max-width: 760px) {
 		.gamebox-container {
-			margin-top: 0;
+			margin-top: 50px;
 			font-size: 14px;
 			.player-records {
 				.player {

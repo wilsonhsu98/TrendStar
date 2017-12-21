@@ -274,7 +274,8 @@
 	}
 	@media only screen and (max-width: 760px) {
 		.search-bar {
-			background-color: $header_bgcolor;
+			background: $header_bgcolor url(../images/icon.png) center 2px no-repeat;
+			background-size: 55px auto;
 			position: fixed;
 			top: 0;
 			left: 0;
@@ -285,16 +286,19 @@
 			text-align: center;
 			&__container {
 				display: block;
-				height: 40px;
-				line-height: 40px;
+				height: 50px;
+				line-height: 50px;
+				text-align: right;
+				padding-right: 14px;
 			}
 			.toggle-search {
 				display: block;
 				position: absolute;
 				top: 0;
+				right: 0;
 				z-index: 1;
-				height: 40px;
-				width: 100%;
+				height: 50px;
+				width: 50px;
 				margin: 0;
 				opacity: 0;
 				&:checked {
@@ -346,7 +350,7 @@
 		#table {
 			display: block;
 			border: none;
-			margin-top: 40px;
+			margin-top: 50px;
 			overflow: hidden;
 			position: relative;
 			z-index: 0;

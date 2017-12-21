@@ -117,7 +117,12 @@ const actions = {
                 return item.data.orders;
             }).reduce((a, b) => a.concat(b), []);
             const period = changedData.map(item => {
-                delete item.data.orders;
+                if (item.data.orders && item.data.orders.length) {
+                    item.data.hasOrder = true;
+                    delete item.data.orders;
+                } else {
+                    item.data.hasOrder = false;
+                }
                 return Object.assign({}, item.data, { game: item.id });
             });
             commit(types.GET_PERIOD, period);

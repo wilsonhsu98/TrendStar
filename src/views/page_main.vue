@@ -22,6 +22,7 @@
 		<div class="content">
 			<router-view></router-view>
 		</div>
+		<loading v-if="loading" :text="loading.text"></loading>
 	</div>
 </template>
 
@@ -164,6 +165,7 @@
 		},
 		computed: {
 			...mapGetters({
+				loading: 'loading',
 			})
 		}
 	}

@@ -79,7 +79,6 @@
 				</div>
 			</template>
 		</div>
-		<loading v-if="loading" :text="loading.text"></loading>
 	</div>
 </template>
 
@@ -595,7 +594,6 @@
 				conditionCols: 'conditionCols',
 				list: 'genStatistics',
 				displayedCols: 'displayedCols',
-				loading: 'loading',
 				lastUpdate: 'lastUpdate',
 				userName: 'userName',
 			}),

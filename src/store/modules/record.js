@@ -95,6 +95,23 @@ const getters = {
     box: state => {
         return utils.displayGame(state.players, state.records.filter(item => item._table === state.game));
     },
+    boxSummary: state => {
+        const result = {
+            win: '贏了',
+            lose: '輸了',
+            tie: '平手',
+        };
+        const boxSummary = state.gameList
+            .find(item => item.games.find(sub => sub.game === state.game)).games
+            .find(item => item.game === state.game);
+        const game = state.records.filter(item => item._table === state.game);
+
+        return Object.assign({}, boxSummary, {
+            result: result[boxSummary.result],
+            h: game.filter(item => ['1H', '2H', '3H', 'HR'].indexOf(item.content) > -1).length,
+            r: game.filter(item => item.r).length,
+        });
+    },
     gameList: state => state.gameList,
 };
 

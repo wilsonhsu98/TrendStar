@@ -2,6 +2,14 @@
 	<div>
 		<mobile-header></mobile-header>
 		<div class="gamebox-container">
+			<div class="box-summary" v-if="boxSummary.league && boxSummary.group">
+				{{ `${boxSummary.league} ${boxSummary.group}組` }}
+				<template v-if="boxSummary.year && boxSummary.season">
+					{{ `(${boxSummary.year} ${boxSummary.season}) ${boxSummary.game}` }}
+				</template>
+				<div>{{ boxSummary.opponent ? 　`V.S. ${boxSummary.opponent}` : '對手不記得了' }}</div>
+				<div class="result" v-if="boxSummary.result">{{ `${boxSummary.h}安 得${boxSummary.r}分 ${boxSummary.result}` }}</div>
+			</div>
 			<div class="player-records" v-for="item in box">
 				<div class="player">
 					<span class="order">{{ item.altOrder ? '代': item.order }}</span><!--
@@ -25,7 +33,6 @@
 				<span class="summary">{{ item.summary }}</span>
 			</div>
 		</div>
-		<loading v-if="loading" :text="loading.text"></loading>
 	</div>
 </template>
 
@@ -33,8 +40,20 @@
 	@import "../scss/variable";
 
 	.gamebox-container {
-		margin-top: 20px;
 		text-align: left;
+		.box-summary {
+			background-color: #fff;
+			border-radius: 10px;
+			margin: 20px 0;
+			padding: 20px;
+			position: relative;
+			.result {
+				position: absolute;
+				top: 20px;
+				right: 20px;
+				font-size: 30px;
+			}
+		}
 		span {
 			display: inline-block;
 			text-align: center;
@@ -138,6 +157,19 @@
 		.gamebox-container {
 			margin-top: 50px;
 			font-size: 14px;
+			.box-summary {
+				background-color: transparent;
+				border-radius: 0;
+				margin: 0;
+				padding: 10px 0;
+				text-align: center;
+				color: $row_color;
+				font-size: 14px;
+				.result {
+					position: initial;
+					font-size: 14px;
+				}
+			}
 			.player-records {
 				.player {
 					flex-basis: 114px;
@@ -212,7 +244,7 @@
 		computed: {
 			...mapGetters({
 				box: 'box',
-				loading: 'loading',
+				boxSummary: 'boxSummary',
 			})
 		}
 	}

@@ -3,17 +3,17 @@
 		<header>
 			<ul class="tab">
 				<li>
-					<router-link :to="{ name: 'games' }" active-class="active" data-label="Games">
+					<router-link :to="{ name: 'games' }" active-class="active" :data-label="$t('menu_games')">
 						<i class="fa fa-table"></i>
 					</router-link>
 				</li>
 				<li>
-					<router-link :to="{ name: 'stats_pa' }" active-class="active" data-label="Stats">
+					<router-link :to="{ name: 'stats_pa' }" active-class="active" :data-label="$t('menu_stats')">
 						<i class="fa fa-list-ol"></i>
 					</router-link>
 				</li>
 				<li>
-					<router-link :to="{ name: 'user' }" active-class="active" data-label="Profile">
+					<router-link :to="{ name: 'user' }" active-class="active" :data-label="$t('menu_profile')">
 						<i class="fa fa-user"></i>
 					</router-link>
 				</li>

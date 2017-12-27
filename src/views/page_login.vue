@@ -2,7 +2,7 @@
 	<div class="login-container">
 		<button class="signin-btn" @click="fbLogin">
 			<i class="fa fa-facebook-square"></i>
-			Sign in with your Facebook account
+			{{ $t('login_btn') }}
 		</button>
 		<loading v-if="loading" :img="loading.img"></loading>
 	</div>

@@ -8,7 +8,7 @@
 					{{ `(${boxSummary.year} ${boxSummary.season}) ${boxSummary.game}` }}
 				</template>
 				<div>{{ boxSummary.opponent ? 　`V.S. ${boxSummary.opponent}` : '對手不記得了' }}</div>
-				<div class="result" v-if="boxSummary.result">{{ `${boxSummary.h}安 得${boxSummary.r}分 ${boxSummary.result}` }}</div>
+				<div class="result" v-if="boxSummary.result">{{ $t('box_summary', { h: boxSummary.h, r: boxSummary.r, result: $t(`box_${boxSummary.result}`)}) }}</div>
 			</div>
 			<div class="player-records" v-for="item in box">
 				<div class="player">

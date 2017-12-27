@@ -67,8 +67,10 @@ const actions = {
 
                 res.forEach(item => {
                     const teddySummary = teddySummarys.find(game => game['場次'] === item.table);
+                    const parseResult = utils.parseGame(item.data);
                     batch.set(db.collection('games').doc(item.table), {
-                        orders: utils.parseGame(item.data),
+                        orders: parseResult.orders,
+                        errors: parseResult.errors,
                         result: ['win', 'lose', 'tie', ''][
                                     ['勝', '敗', '和', ''].indexOf(teddySummary ? teddySummary['結果'] : 3)
                                 ],
@@ -97,8 +99,10 @@ const actions = {
             ])
             .then(res => {
                 const teddySummary = res[0].data.find(item => item['場次'] === game);
+                const parseResult = utils.parseGame(res[1].data);
                 return db.collection('games').doc(game).set({
-                    orders: utils.parseGame(res[1].data),
+                    orders: parseResult.orders,
+                    errors: parseResult.errors,
                     result: ['win', 'lose', 'tie', ''][
                                 ['勝', '敗', '和', ''].indexOf(teddySummary ? teddySummary['結果'] : 3)
                             ],

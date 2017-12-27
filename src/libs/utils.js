@@ -144,32 +144,43 @@ utils.genStatistics = function(players, records, filterPA, filterGames) {
 };
 
 utils.parseGame = function(arr) {
-    var row = 1,
-        col = 3,
+    var nameCol = arr[0].indexOf('名單'),
+        errCol = arr[0].indexOf('失誤'),
+        startCol = arr[0].indexOf('一'),
+        row = 1,
+        col = startCol,
         order = 1,
         result = [],
         scan = [],
-        innArray = ['', '一', '二', '三', '四', '五', '六', '七'];
+        innArray = ['', '一', '二', '三', '四', '五', '六', '七'],
+        errorArr = [];
+
     while (col < arr[0].length && row < arr.length) {
         if (scan.indexOf(row + '' + col) === -1) {
             scan.push(row + '' + col);
             if (arr[row][col]) {
                 var run = '';
                 if (arr[row][col + 2] === 'R') {
-                    run = arr[row][1];
+                    run = arr[row][nameCol];
                 } else if (row + 1 < arr.length && arr[row + 1][col] === '' && arr[row + 1][col + 2] === 'R') {
-                    run = arr[row + 1][1];
+                    run = arr[row + 1][nameCol];
                 }
                 result.push({
                     order: order++,
                     inn: innArray.indexOf(arr[0][col]),
-                    name: arr[row][1],
+                    name: arr[row][nameCol],
                     content: arr[row][col],
                     r: run,
                     rbi: arr[row][col + 1],
                     _row: row
                 });
             }
+        }
+        if (arr[row][errCol] && col === startCol) {
+            errorArr.push({
+                name: arr[row][nameCol],
+                count: arr[row][errCol],
+            });
         }
         row++;
         if (row === arr.length) {
@@ -189,10 +200,13 @@ utils.parseGame = function(arr) {
             }
         }
     }
-    return result.map(function(item) {
-        delete item._row;
-        return item;
-    });
+    return {
+        orders: result.map(function(item) {
+            delete item._row;
+            return item;
+        }),
+        errors: errorArr,
+    };
 };
 
 utils.displayGame = function(players, records) {
@@ -235,7 +249,7 @@ utils.displayGame = function(players, records) {
             const find = arr.find(sub => sub.name === item.name);
             if (find) {
                 let middleArr = [];
-                middleArr.length = Math.ceil(item.order / order - 1) - find.content.length;
+                middleArr.length = Math.ceil(item.order / (order || 10) - 1) - find.content.length;
                 find.content = find.content.concat(middleArr, item);
             } else {
                 // Handle 代打
@@ -249,7 +263,7 @@ utils.displayGame = function(players, records) {
                 });
                 if (index > -1) {
                     let middleArr = [];
-                    middleArr.length = Math.ceil(item.order / order - 1);
+                    middleArr.length = Math.ceil(item.order / (order || 10) - 1);
                     arr.splice(index + 1, 0, {
                         name: item.name,
                         data: (players.find(sub => sub.id === item.name) || {data: {}}).data,
@@ -270,7 +284,7 @@ utils.displayGame = function(players, records) {
             });
             if (item.r && item.r !== item.name && index > -1) {
                 let middleArr = [];
-                middleArr.length = Math.ceil(item.order / order - 1);
+                middleArr.length = Math.ceil(item.order / (order || 10) - 1);
                 arr.splice(index + 1, 0, {
                     name: item.r,
                     data: (players.find(sub => sub.id === item.r) || {data: {}}).data,

@@ -2,7 +2,7 @@
 	<div class="profile-container">
 		<mobile-header></mobile-header>
 		<button class="logout-btn" @click="fbLogout">
-			log out
+			{{ $t('logout_btn') }}
 		</button>
 	</div>
 </template>

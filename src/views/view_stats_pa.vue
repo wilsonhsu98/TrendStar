@@ -4,49 +4,53 @@
  			<div class="search-bar__container"><i class="fa fa-search"></i></div>
  			<input type="checkbox" class="toggle-search" v-model="toggleSearch"/>
  			<div class="condition">
-				<div class="condition__label">Period:</div>
+				<div class="condition__label">{{ $t('col_period') }}</div>
 				<div class="condition__element">
-					<select class="dropdown" :value="periodSelect" @change="setPeriod($event.target.value)">
-						<option v-for="item in period">{{ item.period }}</option>
-					</select>
+					<div class="selectdiv">
+						<select class="dropdown" :value="periodSelect" @change="setPeriod($event.target.value)">
+							<option v-for="item in period" :value="item.period">{{ `${item.period === 'period_all' ? $t(item.period) : item.period}` }}</option>
+						</select>
+					</div>
 				</div>
-				<div class="condition__label">Sort by:</div>
+				<div class="condition__label">{{ $t('col_sort') }}</div>
 				<div class="condition__element">
-					<select class="dropdown" :value="sortBy" @change="setSortBy($event.target.value)">
-						<option v-for="col in conditionCols">{{ col.name }}</option>
-					</select>
+					<div class="selectdiv">
+						<select class="dropdown" :value="sortBy" @change="setSortBy($event.target.value)">
+							<option v-for="col in conditionCols" :value="col.name">{{ $t(col.name) }}</option>
+						</select>
+					</div>
 				</div>
-				<div class="condition__label">Latest PA:</div>
+				<div class="condition__label">{{ $t('col_latest') }}</div>
 				<div class="condition__element pa">
 					<minus-plus-number :value="top" :disabled="unlimitedPA" @change="setTop"/>
 					<label for="unlimited_pa"><!--
 					 	 --><input id="unlimited_pa" type="checkbox" :checked="unlimitedPA" @change="setUnlimitedPA($event.target.checked)"/><!--
-					 	  -->Unlimited<!--
+					 	  -->{{ $t('col_unlimited') }}<!--
 				 	 --></label>
 				</div>
 				<br>
-				<div class="condition__label col">Display:</div>
+				<div class="condition__label col">{{ $t('col_display') }}</div>
 				<div class="condition__element col">
 					<label class="condition__col" for="check_all"><!--
 						 --><input id="check_all" type="checkbox" :checked="checkAll" @change="setCheckAll_($event.target.checked)"/><!--
-						 -->All<!--
+						 -->{{ $t('All') }}<!--
 					 --></label><!--
 					 --><label class="condition__col" :for="col.name" v-for="col in conditionCols"><!--
 						 --><input :id="col.name" type="checkbox" :value="col.name" :checked="col.visible" :disabled="col.disabled" @change="toggleColumn(col.name)"/><!--
-						 -->{{ col.name }}<!--
+						 -->{{ $t(col.name) }}<!--
 					 --></label>
-				 </div>
-				 <template v-if="lastUpdate">
-					 <div class="condition__label date">Last update:</div>
-					 <div class="condition__element date">{{ new Date(lastUpdate).toLocaleString() }}</div>
-				 </template>
-				 <i class="fa fa-refresh" @click="refreshPlayer"></i>
+				</div>
+				<template v-if="lastUpdate">
+					<div class="condition__label date">{{ $t('col_update') }}</div>
+					<div class="condition__element date" :data-long="`${$t('col_update')} `" :data-short="`${$t('col_update_short')} `">{{ new Date(lastUpdate).toLocaleString() }}</div>
+				</template>
+				<i class="fa fa-refresh" @click="refreshPlayer"></i>
 			</div>
 		</div>
 		<div id="table">
 			<div class="header-row">
 				<span class="cell delete"><i class="fa fa-refresh" @click="refreshPlayer"></i></span>
-				<span :class="`cell ${col.name}`" v-for="col in displayedCols">{{ col.name }}</span>
+				<span :class="`cell ${col.name}`" v-for="col in displayedCols">{{ $t(col.name) }}</span>
 			</div>
 			<template v-for="(item, index) in list">
 				<input type="radio" name="expand" class="toggle-row" @click="toggleRadio($event)"/>
@@ -62,11 +66,11 @@
 								{{ item.name }}
 							</span>
 						</span>
-						<span v-else :class="`cell${col.name === sortBy ? ' sort' : ''}`" :data-label="col.name">
+						<span v-else :class="`cell${col.name === sortBy ? ' sort' : ''}`" :data-label="$t(col.name)">
 							{{ formatValue(item[col.name], col.name) }}
 						</span>
 					</template>
-					<div v-if="item.listByGame.length" class="cell chart">
+					<div v-if="item.listByGame.length" class="cell chart" :style="{ top: `${(index + 2) * 36}px` }">
 						<div class="chart-inner">
 							<div class="bar" v-for="cube in item.listByGame">
 								<template v-for="(cell, i) in cube">
@@ -108,7 +112,7 @@
 		}
 		&__element {
 			&.col {
-				width: calc(100% - 80px);
+				width: calc(100% - 90px);
 				height: auto;
 			}
 		}
@@ -120,7 +124,7 @@
 
 	.dropdown {
 		height: 30px;
-		width: 100px;
+		width: 110px;
 		border: 2px solid rgb(166, 166, 166);
 		background-color: rgb(248, 248, 248);
 		border-radius: 5px;
@@ -138,7 +142,6 @@
 		margin: 0;
 		box-sizing: border-box;
 		color: $row_color;
-		// border: 1px solid $table_bordercolor;
 		position: relative;
 		z-index: 0;
 		.header-row {
@@ -196,15 +199,13 @@
 				display: none;
 
 				font-size: 12px;
-				margin-top: 36px;
 				margin-bottom: 20px;
 				padding-top: 5px;
-				// border: 1px solid $table_bordercolor;
 				border-top: 0;
 				box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 				.chart-inner {
 					display: flex;
-					flex-direction: row-reverse;
+					direction: rtl;
 					align-items: flex-end;
 					width: 100%;
 					overflow-x: auto;
@@ -386,8 +387,9 @@
 					&:before {
 						content: attr(data-label) ":";
 						display: inline-block;
-						width: 40px;
+						width: 58px;
 						text-align: right;
+						margin-right: -6px;
 					}
 				}
 				&.Rank {
@@ -411,6 +413,7 @@
 					box-shadow: none;
 					background-color: transparent;
 					display: flex;
+					width: 100%;
 				}
 			}
 			.toggle-row {
@@ -468,10 +471,16 @@
 						justify-self: end;
 						padding: 0 10px 10px 0;
 						&:before {
-							content: 'Update: '
+							content: attr(data-short)
 						}
 					}
 				}
+			}
+		}
+		[lang=zh-TW] {
+			.search-bar .condition__element.col {
+				grid-template-columns: repeat(3, 1fr);
+				font-size: 14px;
 			}
 		}
 	}
@@ -521,10 +530,16 @@
 						justify-self: end;
 						padding: 0 10px 10px 0;
 						&:before {
-							content: 'Last update: '
+							content: attr(data-long);
 						}
 					}
 				}
+			}
+		}
+		[lang=zh-TW] {
+			.search-bar .condition__element.col {
+				grid-template-columns: repeat(7, 1fr);
+				font-size: 12px;
 			}
 		}
 	}

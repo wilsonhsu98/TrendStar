@@ -29,7 +29,7 @@ const types = {
 const state = {
     players: [],
     records: [],
-    period: [{ period: 'All time', select: true }],
+    period: [{ period: 'period_all', select: true }],
     top: 10,
     unlimitedPA: false,
     hiddenPlayer: [],
@@ -96,18 +96,13 @@ const getters = {
         return utils.displayGame(state.players, state.records.filter(item => item._table === state.game));
     },
     boxSummary: state => {
-        const result = {
-            win: '贏了',
-            lose: '輸了',
-            tie: '平手',
-        };
         const boxSummary = state.gameList
             .find(item => item.games.find(sub => sub.game === state.game)).games
             .find(item => item.game === state.game);
         const game = state.records.filter(item => item._table === state.game);
 
         return Object.assign({}, boxSummary, {
-            result: result[boxSummary.result],
+            result: boxSummary.result,
             h: game.filter(item => ['1H', '2H', '3H', 'HR'].indexOf(item.content) > -1).length,
             r: game.filter(item => item.r).length,
         });
@@ -247,7 +242,7 @@ const mutations = {
         if (pref_hiddenplayer) state.hiddenPlayer = JSON.parse(pref_hiddenplayer);
     },
     [types.GET_PERIOD](state, data) {
-        state.period.find(item => item.period === 'All time').games = data.map(item => item.game).sort((a, b) => {
+        state.period.find(item => item.period === 'period_all').games = data.map(item => item.game).sort((a, b) => {
             return parseInt(b.match(/\d/g).join(''), 10) - parseInt(a.match(/\d/g).join(''), 10)
         });
 
@@ -256,13 +251,17 @@ const mutations = {
         data.map(item => item.year + item.season)
             .filter((value, index, self) => self.indexOf(value) === index)
             .map(item => ({period: item, games: data.filter(sub => (sub.year + sub.season) === item ).map(sub => sub.game)}))
-            .sort((a, b)=> a.period < b.period)
             .forEach(item => {
                 const find = state.period.find(sub => sub.period === item.period);
                 if (!find) {
                     state.period.push(item);
                 }
             });
+
+        state.period = state.period.sort((a, b) => a.period < b.period);
+        if (!state.period.find(item => item.select)) {
+            state.period.find(item => item.period === 'period_all').select = true;
+        }
     },
     [types.GET_PLAYERS](state, data) {
         state.players = data;

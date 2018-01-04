@@ -1,9 +1,9 @@
 <template>
 	<div>
 		<div class="search-bar" ref="searchBar">
- 			<div class="search-bar__container"><i class="fa fa-search"></i></div>
- 			<input type="checkbox" class="toggle-search" v-model="toggleSearch"/>
- 			<div class="condition">
+			<div class="search-bar__container"><i class="fa fa-search"></i></div>
+			<input type="checkbox" class="toggle-search" v-model="toggleSearch"/>
+			<div class="condition">
 				<div class="condition__label">{{ $t('col_period') }}</div>
 				<div class="condition__element">
 					<div class="selectdiv">
@@ -24,9 +24,9 @@
 				<div class="condition__element pa">
 					<minus-plus-number :value="top" :disabled="unlimitedPA" @change="setTop"/>
 					<label for="unlimited_pa"><!--
-					 	 --><input id="unlimited_pa" type="checkbox" :checked="unlimitedPA" @change="setUnlimitedPA($event.target.checked)"/><!--
-					 	  -->{{ $t('col_unlimited') }}<!--
-				 	 --></label>
+						 --><input id="unlimited_pa" type="checkbox" :checked="unlimitedPA" @change="setUnlimitedPA($event.target.checked)"/><!--
+						  -->{{ $t('col_unlimited') }}<!--
+					 --></label>
 				</div>
 				<br>
 				<div class="condition__label col">{{ $t('col_display') }}</div>
@@ -50,7 +50,7 @@
 		<div id="table">
 			<div class="header-row">
 				<span class="cell delete"><i class="fa fa-refresh" @click="refreshPlayer"></i></span>
-				<span :class="`cell ${col.name}`" v-for="col in displayedCols">{{ $t(col.name) }}</span>
+				<span :class="`cell ${col.name}`" v-for="col in displayedCols" :title="$t(col.name)"><div>{{ $t(col.name) }}</div></span>
 			</div>
 			<template v-for="(item, index) in list">
 				<input type="radio" name="expand" class="toggle-row" @click="toggleRadio($event)"/>
@@ -75,7 +75,7 @@
 							<div class="bar" v-for="cube in item.listByGame">
 								<template v-for="(cell, i) in cube">
 									<span v-if="i === cube.length - 1" class="game">{{ cell }}</span>
-									<span v-else :class="`item ${cell.color} ${cell.exclude ? 'exclude' : ''}`">{{ cell.content }}</span>
+									<span v-else :class="`item ${cell.color} ${cell.exclude ? 'exclude' : ''}`">{{ $t(cell.content) }}</span>
 								</template>
 							</div>
 						</div>
@@ -149,6 +149,10 @@
 			background: $header_bgcolor;
 			color: $header_color;
 			.cell {
+				> div {
+					height: 36px;
+					overflow : hidden;
+				}
 				&.Rank, &.delete { width: 45px; }
 				&.name {
 					width: 100px;
@@ -182,6 +186,9 @@
 				color: $current_user_color;
 				.cell .img {
 					border-color: $current_user_color;
+				}
+				.cell.chart .game {
+					color: $row_color;
 				}
 			}
 		}
@@ -370,6 +377,9 @@
 					color: $current_user_color;
 					.cell .img {
 						border-color: $current_user_color;
+					}
+					.cell.chart .game {
+						color: $current_user_color;
 					}
 				}
 			}

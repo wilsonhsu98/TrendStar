@@ -27,6 +27,21 @@ exports.import_game = functions.https.onRequest((req, res) => {
 		});
 });
 
+const contentMapping = {
+    '1H': '1H',
+    '2H': '2H',
+    '3H': '3H',
+    'HR': 'HR',
+    '飛球': 'FO',
+    '滾地': 'GO',
+    'BB': 'BB',
+    'K': 'K',
+    'E': 'E',
+    '野選': 'FC',
+    '犧飛': 'SF',
+    '雙殺': 'DP',
+    '三殺': 'TP',
+};
 const parseGame = function(arr) {
     var nameCol = arr[0].indexOf('名單'),
         errCol = arr[0].indexOf('失誤'),
@@ -53,7 +68,7 @@ const parseGame = function(arr) {
                     order: order++,
                     inn: innArray.indexOf(arr[0][col]),
                     name: arr[row][nameCol],
-                    content: arr[row][col],
+                    content: contentMapping[arr[row][col]],
                     r: run,
                     rbi: arr[row][col + 1],
                     _row: row

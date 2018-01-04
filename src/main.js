@@ -23,14 +23,14 @@ document.getElementsByTagName('html')[0].setAttribute('lang', currentLocale);
 
 let componentsReq = require.context("./components/", false, /\.vue$/);
 componentsReq.keys().forEach(path => {
-    Vue.component(path.replace(/(\_|\b|\-)./g, function(a) { return a.toUpperCase(); }).replace(/(\_|\b|\-|\.\/|\.vue)*/ig, ""), componentsReq(path).default);
+	Vue.component(path.replace(/(\_|\b|\-)./g, function(a) { return a.toUpperCase(); }).replace(/(\_|\b|\-|\.\/|\.vue)*/ig, ""), componentsReq(path).default);
 });
 
 const app = new Vue({
-    el: '#app',
-    store,
-    router,
-    i18n,
+	el: '#app',
+	store,
+	router,
+	i18n,
 });
 
 const version = 4;

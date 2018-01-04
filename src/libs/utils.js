@@ -42,7 +42,7 @@ utils.genStatistics = function(players, records, filterPA, filterGames) {
                     .map(item => {
                         let color = 'blue';
                         if (['1H', '2H', '3H', 'HR'].indexOf(item.content) > -1) color = 'red';
-                        if (['BB', '犧飛'].indexOf(item.content) > -1) color = 'yellow';
+                        if (['BB', 'SF'].indexOf(item.content) > -1) color = 'yellow';
                         return {
                             name: item.name,
                             content: item.content,
@@ -56,7 +56,7 @@ utils.genStatistics = function(players, records, filterPA, filterGames) {
 
         top.forEach(function(item) {
             pa += 1;
-            ab += ['1H', '2H', '3H', 'HR', '飛球', '滾地', 'K', 'E', '野選', '雙殺'].indexOf(item.content) > -1 ? 1 : 0;
+            ab += ['1H', '2H', '3H', 'HR', 'FO', 'GO', 'K', 'E', 'FC', 'DP', 'TP'].indexOf(item.content) > -1 ? 1 : 0;
             h += ['1H', '2H', '3H', 'HR'].indexOf(item.content) > -1 ? 1 : 0;
             tb += ['1H', '2H', '3H', 'HR'].indexOf(item.content) + 1;
             tob += ['1H', '2H', '3H', 'HR', 'BB'].indexOf(item.content) > -1 ? 1 : 0;
@@ -68,8 +68,8 @@ utils.genStatistics = function(players, records, filterPA, filterGames) {
             hr += item.content === 'HR' ? 1 : 0;
             k += item.content === 'K' ? 1 : 0;
             bb += item.content === 'BB' ? 1 : 0;
-            sf += item.content === '犧飛' ? 1 : 0;
-            dp += item.content === '雙殺' ? 1 : 0;
+            sf += item.content === 'SF' ? 1 : 0;
+            dp += item.content === 'DP' ? 1 : 0;
         });
 
         if (filterPA === undefined) {
@@ -142,7 +142,21 @@ utils.genStatistics = function(players, records, filterPA, filterGames) {
         return obj;
     });
 };
-
+var contentMapping = {
+    '1H': '1H',
+    '2H': '2H',
+    '3H': '3H',
+    'HR': 'HR',
+    '飛球': 'FO',
+    '滾地': 'GO',
+    'BB': 'BB',
+    'K': 'K',
+    'E': 'E',
+    '野選': 'FC',
+    '犧飛': 'SF',
+    '雙殺': 'DP',
+    '三殺': 'TP',
+};
 utils.parseGame = function(arr) {
     var nameCol = arr[0].indexOf('名單'),
         errCol = arr[0].indexOf('失誤'),
@@ -169,7 +183,7 @@ utils.parseGame = function(arr) {
                     order: order++,
                     inn: innArray.indexOf(arr[0][col]),
                     name: arr[row][nameCol],
-                    content: arr[row][col],
+                    content: contentMapping[arr[row][col]],
                     r: run,
                     rbi: arr[row][col + 1],
                     _row: row
@@ -217,7 +231,7 @@ utils.displayGame = function(players, records) {
         contentColor = (content) => {
             let color = 'blue';
             if (['1H', '2H', '3H', 'HR'].indexOf(content) > -1) color = 'red';
-            if (['BB', '犧飛'].indexOf(content) > -1) color = 'yellow';
+            if (['BB', 'SF'].indexOf(content) > -1) color = 'yellow';
             return color;
         };
     records.map((item, i, self) => {
@@ -296,7 +310,7 @@ utils.displayGame = function(players, records) {
                         order: item.order,
                         r: item.r,
                         color: 'gray',
-                        content: '代跑',
+                        content: 'PR',
                     }),
                 });
             }
@@ -309,7 +323,7 @@ utils.displayGame = function(players, records) {
         let ab = 0;
         let h = 0;
         item.content.forEach(sub => {
-            ab += ['1H', '2H', '3H', 'HR', '飛球', '滾地', 'K', 'E', '野選', '雙殺'].indexOf(sub.content) > -1 ? 1 : 0;
+            ab += ['1H', '2H', '3H', 'HR', 'FO', 'GO', 'K', 'E', 'FC', 'DP', 'TP'].indexOf(sub.content) > -1 ? 1 : 0;
             h += ['1H', '2H', '3H', 'HR'].indexOf(sub.content) > -1 ? 1 : 0;
         });
         item.content.length = paMax;

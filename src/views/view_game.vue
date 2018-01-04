@@ -3,16 +3,16 @@
 		<mobile-header></mobile-header>
 		<div class="gamebox-container">
 			<div class="box-summary" v-if="boxSummary.league && boxSummary.group">
-				{{ `${boxSummary.league} ${boxSummary.group}組` }}
+				{{ `${boxSummary.league} ${$t('box_group', { g: boxSummary.group })}` }}
 				<template v-if="boxSummary.year && boxSummary.season">
 					{{ `(${boxSummary.year} ${boxSummary.season}) ${boxSummary.game}` }}
 				</template>
-				<div>{{ boxSummary.opponent ? 　`V.S. ${boxSummary.opponent}` : '對手不記得了' }}</div>
+				<div>{{ boxSummary.opponent ? $t('box_opponent', { opponent: boxSummary.opponent }) : $t('box_forgot_opponent') }}</div>
 				<div class="result" v-if="boxSummary.result">{{ $t('box_summary', { h: boxSummary.h, r: boxSummary.r, result: $t(`box_${boxSummary.result}`)}) }}</div>
 			</div>
 			<div class="player-records" v-for="item in box">
 				<div class="player">
-					<span class="order">{{ item.altOrder ? '代': item.order }}</span><!--
+					<span class="order">{{ item.altOrder ? $t('PH'): item.order }}</span><!--
 					 --><span class="name">
 							<span class="img" :style="item.data.img ? `background-image: url(${item.data.img})` : 'border-width: 1px'">
 								<i v-if="!item.data.img" class="fa fa-user-o"></i>
@@ -26,7 +26,7 @@
 							<div class="record" v-if="record === undefined"></div>
 							<div class="record" v-else>
 								<span class="inn">{{ record.innChange }}</span><!--
-								 --><span :class="`content ${record.color} ${record.rbi ? 'rbi' : ''} ${record.r === record.name ? 'run' : ''}`" :data-rbi="record.rbi" :data-run="`${record.r === record.name ? 'R' : ''}`">{{ record.content }}</span>
+								 --><span :class="`content ${record.color} ${record.rbi ? 'rbi' : ''} ${record.r === record.name ? 'run' : ''}`" :data-rbi="record.rbi" :data-run="`${record.r === record.name ? 'R' : ''}`">{{ $t(record.content) }}</span>
 							</div>
 						</template>
 					</div>

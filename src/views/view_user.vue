@@ -4,6 +4,7 @@
 		<button class="logout-btn" @click="fbLogout">
 			{{ $t('logout_btn') }}
 		</button>
+		<!-- <coordination :values="dots"/> -->
 	</div>
 </template>
 
@@ -42,6 +43,11 @@
 	import { mapGetters, mapActions } from 'vuex';
 
 	export default {
+		data() {
+			return {
+				// dots: [{x: 50, y: 50, color: 'blue'}, {x: 30, y: 30}]
+			};
+		},
 		created() {
 			// this.chkLoginStatus();
 		},
@@ -50,7 +56,7 @@
 				// fbLogin: 'fbLogin',
 				// chkLoginStatus: 'chkLoginStatus',
 				fbLogout: 'fbLogout',
-			})
+			}),
 		},
 		computed: {
 			...mapGetters({

@@ -8,7 +8,7 @@
 		<br>
 		<br>
 		<coordination @change="valueCange"/>
-		<div>{{ this.coordination ? `x: ${this.coordination.x} y: ${this.coordination.y} location: ${this.coordination.location}` : '' }}</div>
+		<div style="height: 30px; line-height: 30px;">{{ this.coordination ? `x: ${this.coordination.x} y: ${this.coordination.y} location: ${this.coordination.location}` : '' }}</div>
 	</div>
 </template>
 

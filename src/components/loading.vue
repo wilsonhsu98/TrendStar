@@ -115,8 +115,6 @@
 		props: ['text', 'img'],
 		data() {
 			return {
-				text: this.text,
-				img: this.img,
 			}
 		},
 	};

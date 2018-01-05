@@ -30,8 +30,8 @@
 <style lang="scss" scoped>
 	.canvas {
 		display: inline-block;
-		width: 100vw;
-		height: 100vw;
+		width: 500px;
+		height: 500px;
 		background-color: green;
 		overflow: hidden;
 		position: relative;
@@ -272,6 +272,12 @@
 				border-radius: 50%;
 				position: absolute;
 			}
+		}
+	}
+	@media only screen and (max-width: 760px) {
+		.canvas {
+			width: 100vw;
+			height: 100vw;
 		}
 	}
 </style>

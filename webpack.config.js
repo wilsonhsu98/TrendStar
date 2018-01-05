@@ -62,7 +62,7 @@ let config = {
 		 * Vue v2.x 之後 NPM Package 預設只會匯出 runtime-only 版本
 		 */
 		alias: {
-			vue: 'vue/dist/vue.min.js'
+			vue: 'vue/dist/vue.js'
 		}
 	}
 };
@@ -71,7 +71,7 @@ let config = {
 if (__PROD__) {
 	config.output.filename = 'assets/js/[name].js';
 	config.bail = true;
-
+	config.resolve.alias.vue = 'vue/dist/vue.min.js';
 	config.module.loaders.push({
 		test: /\.vue$/,
 		loader: 'vue-loader',

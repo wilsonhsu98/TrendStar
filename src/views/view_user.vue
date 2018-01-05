@@ -5,6 +5,10 @@
 			{{ $t('logout_btn') }}
 		</button>
 		<!-- <coordination :values="dots"/> -->
+		<br>
+		<br>
+		<coordination @change="valueCange"/>
+		<div>{{ this.coordination ? `x: ${this.coordination.x} y: ${this.coordination.y} location: ${this.coordination.location}` : '' }}</div>
 	</div>
 </template>
 
@@ -45,6 +49,7 @@
 	export default {
 		data() {
 			return {
+				coordination: { x: '', y: '', location: ''},
 				// dots: [{x: 50, y: 50, color: 'blue'}, {x: 30, y: 30}]
 			};
 		},
@@ -57,6 +62,9 @@
 				// chkLoginStatus: 'chkLoginStatus',
 				fbLogout: 'fbLogout',
 			}),
+			valueCange(val) {
+				this.coordination = val;
+			},
 		},
 		computed: {
 			...mapGetters({

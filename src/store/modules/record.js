@@ -255,6 +255,8 @@ const mutations = {
                 const find = state.period.find(sub => sub.period === item.period);
                 if (!find) {
                     state.period.push(item);
+                } else {
+                    find.games = item.games;
                 }
             });
 

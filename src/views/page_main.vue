@@ -41,9 +41,10 @@
 		top: 0;
 		left: 0;
 		right: 0;
-		z-index: 1;
+		z-index: 2;
 		background-color: $header_bgcolor;
 		height: $header_menu_height;
+		box-shadow: 0 2px 12px 0 rgba(0,0,0,.13), 0 0 2px 0 rgba(0,0,0,.2);
 		.tab {
 			box-sizing: border-box;
 			list-style-type: none;
@@ -114,7 +115,7 @@
 					color: $header_color;
 					.fa {
 						display: block;
-						width: 44px;
+						width: 40px;
 						height: 30px;
 						line-height: 30px;
 						margin: 0 auto;
@@ -132,10 +133,10 @@
 					.fa {
 						background-color: $current_user_bgcolor;
 						border-radius: 50%;
-						width: 44px;
-						height: 44px;
+						width: 40px;
+						height: 40px;
 						line-height: 44px;
-						margin-bottom: 1px;
+						margin-bottom: 3px;
 						color: $current_user_color;
 						opacity: .9;
 					}

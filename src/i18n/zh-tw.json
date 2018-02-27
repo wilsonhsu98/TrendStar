@@ -1,6 +1,7 @@
 {
 	"login_btn": "使用FB帳號登入",
 	"logout_btn": "登出",
+	"fb_share": "分享",
 	"menu_games": "盒子",
 	"menu_stats": "排行",
 	"menu_profile": "個人",

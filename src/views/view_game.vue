@@ -19,7 +19,7 @@
 							</span>
 							{{ item.name }}
 						</span><!--
-					 --><span class="alt"></span>
+					 --><span class="error">{{ item.error > 0 ? `${item.error}E` : '' }}</span>
 				</div><!--
 				 --><div class="records">
 						<template v-for="record in item.content">
@@ -32,6 +32,12 @@
 					</div>
 				<span class="summary">{{ item.summary }}</span>
 			</div>
+		</div>
+		<div style="text-align:center; margin: 10px;">
+			<button class="share-btn" @click="screenshot">
+				<i class="fa fa-facebook-square"></i>
+				{{ $t('fb_share') }}
+			</button>
 		</div>
 	</div>
 </template>
@@ -67,6 +73,7 @@
 			&:nth-child(even) { background-color: $row_odd_bgcolor; }
 			.player {
 				display: inline-block;
+				width: 160px;
 				.order {
 					text-align: right;
 					width: 30px;
@@ -87,7 +94,7 @@
 						box-sizing: border-box;
 						border-radius: 50%;
 						background: 50% 50% no-repeat;
-						background-size: 32px auto;
+						background-size: cover;
 						position: absolute;
 						top: 2px;
 						left: 0;
@@ -98,6 +105,9 @@
 							vertical-align: middle;
 						}
 					}
+				}
+				.error {
+					color: $current_user_bgcolor;
 				}
 			}
 			.records {
@@ -153,6 +163,26 @@
 		}
 
 	}
+	.share-btn {
+		border-radius: 5px;
+		background-color: #365899;
+		color: white;
+		border: 1px solid transparent;
+		padding: 10px 15px;
+		position: relative;
+		top: 50%;
+		&:focus {
+			outline: none;
+		}
+		&:disabled {
+			opacity: .3;
+		}
+		.fa-facebook-square {
+			font-size: 2em;
+			vertical-align: middle;
+			margin-right: 4px;
+		}
+	}
 	@media only screen and (max-width: 760px) {
 		.gamebox-container {
 			margin-top: 50px;
@@ -172,7 +202,7 @@
 			}
 			.player-records {
 				.player {
-					flex-basis: 114px;
+					flex-basis: 128px;
 					.order {
 						width: 20px;
 						padding-right: 4px;
@@ -197,6 +227,7 @@
 							max-width: 60px;
 							height: 34px;
 							align-self: center;
+							overflow: hidden;
 							&.run:before,
 							&.rbi:after {
 								height: 10px;
@@ -219,6 +250,8 @@
 <script>
 	import Vue from 'vue';
 	import { mapGetters, mapActions } from 'vuex';
+	import html2canvas from 'html2canvas';
+	import axios from 'axios';
 
 	export default {
 		data() {
@@ -230,21 +263,50 @@
 		},
 		mounted() {
 			Vue.nextTick().then(() => {
-				document.querySelector('a[href="#/main/games"]').classList.add('active');
+				document.querySelector('a[href^="#/main/games"]').classList.add('active');
 			});
 		},
 		beforeDestroy() {
-			document.querySelector('a[href="#/main/games"]').classList.remove('active');
+			document.querySelector('a[href^="#/main/games"]').classList.remove('active');
 		},
 		methods: {
 			...mapActions({
 				setGame: 'setGame',
-			})
+				toggleLoading: 'toggleLoading',
+			}),
+			screenshot() {
+				this.toggleLoading(true);
+				html2canvas(document.querySelector('.gamebox-container'), {
+						useCORS: true,
+						logging: false,
+					})
+					.then(canvas => {
+						const formData = new FormData();
+						formData.append('image', canvas.toDataURL('image/jpeg', 1.0).split(',')[1]);
+						return axios.post('https://api.imgur.com/3/image', formData, {
+							headers: {
+								Authorization: 'Client-ID af58b85d81d963f'
+							}
+						});
+					})
+					.then(res => {
+						this.toggleLoading(false);
+						FB.ui({
+							method: 'share',
+							href: res.data.data.link,
+							mobile_iframe: true,
+						}, response => {});
+					})
+					.catch(() => {
+						this.toggleLoading(false);
+					});
+			},
 		},
 		computed: {
 			...mapGetters({
 				box: 'box',
 				boxSummary: 'boxSummary',
+				loading: 'loading',
 			})
 		}
 	}

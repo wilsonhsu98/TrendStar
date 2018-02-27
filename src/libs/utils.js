@@ -223,7 +223,7 @@ utils.parseGame = function(arr) {
     };
 };
 
-utils.displayGame = function(players, records) {
+utils.displayGame = function(players, records, errors) {
     var arr = [],
         order = 0,
         inn = 0,
@@ -322,12 +322,14 @@ utils.displayGame = function(players, records) {
     arr.forEach(item => {
         let ab = 0;
         let h = 0;
+        const error = errors.find(sub => sub.name === item.name);
         item.content.forEach(sub => {
             ab += ['1H', '2H', '3H', 'HR', 'FO', 'GO', 'K', 'E', 'FC', 'DP', 'TP'].indexOf(sub.content) > -1 ? 1 : 0;
             h += ['1H', '2H', '3H', 'HR'].indexOf(sub.content) > -1 ? 1 : 0;
         });
         item.content.length = paMax;
         item.summary = `${ab}-${h}`;
+        item.error = error && error.count;
     });
     return arr;
 };

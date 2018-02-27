@@ -93,7 +93,10 @@ const getters = {
     },
     lastUpdate: state => state.lastUpdate,
     box: state => {
-        return utils.displayGame(state.players, state.records.filter(item => item._table === state.game));
+        const boxSummary = state.gameList
+            .find(item => item.games.find(sub => sub.game === state.game)).games
+            .find(item => item.game === state.game);
+        return utils.displayGame(state.players, state.records.filter(item => item._table === state.game), boxSummary.errors);
     },
     boxSummary: state => {
         const boxSummary = state.gameList

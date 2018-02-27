@@ -294,6 +294,7 @@
 						FB.ui({
 							method: 'share',
 							href: res.data.data.link,
+							display: 'popup',
 						}, response => {});
 					})
 					.catch(() => {

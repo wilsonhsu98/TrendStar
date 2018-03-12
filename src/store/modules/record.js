@@ -234,7 +234,7 @@ const actions = {
 const mutations = {
     [types.INIT_FROM_LS](state) {
         state.top = parseInt(window.localStorage.getItem("pref_top"), 10) || state.top;
-        state.unlimitedPA = window.localStorage.getItem("pref_unlimited_pa") || state.unlimitedPA;
+        state.unlimitedPA = window.localStorage.getItem("pref_unlimited_pa") === 'true' || state.unlimitedPA;
         state.sortBy = window.localStorage.getItem("pref_sortby") || state.sortBy;
 
         const pref_period = window.localStorage.getItem("pref_period");

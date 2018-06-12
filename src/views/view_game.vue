@@ -14,8 +14,10 @@
 				<div class="player">
 					<span class="order">{{ item.altOrder ? $t('PH'): item.order }}</span><!--
 					 --><span class="name">
-							<span class="img" :style="item.data.img ? `background-image: url(${item.data.img})` : 'border-width: 1px'">
-								<i v-if="!item.data.img" class="fa fa-user-o"></i>
+							<span class="img" style="border-width: 1px">
+								<i class="fa fa-user-o"></i>
+							</span>
+							<span v-if="item.data.img" class="img" :style="`background-image: url(${item.data.img})`">
 							</span>
 							{{ item.name }}
 						</span><!--

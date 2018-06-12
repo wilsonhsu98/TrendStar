@@ -60,8 +60,10 @@
 						<span v-if="col.name === 'Rank'" class="cell Rank" data-label="Rank">{{ index + 1 }}</span>
 						<span v-else-if="col.name === 'name'" class="cell name" data-label="name">
 							<span>
-								<span class="img" :style="item.data.img ? `background-image: url(${item.data.img})` : 'border-width: 1px'">
-									<i v-if="!item.data.img" class="fa fa-user-o"></i>
+								<span class="img" style="border-width: 1px">
+									<i class="fa fa-user-o"></i>
+								</span>
+								<span v-if="item.data.img" class="img" :style="`background-image: url(${item.data.img})`">
 								</span>
 								{{ item.name }}
 							</span>

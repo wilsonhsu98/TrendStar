@@ -42,21 +42,36 @@ const actions = {
                         commit(types.SET_TOKEN, result.credential.accessToken);
                     }
                     if (result.additionalUserInfo && result.additionalUserInfo.isNewUser) {
-                        // new user registration & binding account
-                        const fbGraphQL = `https://graph.facebook.com/v2.11/me?access_token=${state.token}&fields=name&locale=zh_TW`;
-                        axios.get(fbGraphQL).then(res => refPlayers.where("fb", "==", res.data.name).get())
+                            // new user registration & binding account
+                            const fbGraphQL = `https://graph.facebook.com/v2.11/me?access_token=${state.token}&fields=name&locale=zh_TW`;
+                            axios.get(fbGraphQL).then(res => refPlayers.where("fb", "==", res.data.name).get())
+                                .then(snapshot => {
+                                    if (snapshot.size) {
+                                        commit(types.SET_USERNAME, snapshot.docs[0].id);
+                                        return refPlayers.doc(snapshot.docs[0].id).set({
+                                            img: result.additionalUserInfo.profile.picture.data.url,
+                                            userId: user.uid,
+                                        }, { merge: true });
+                                    } else {
+                                        return;
+                                    }
+                                })
+                                .then(() => {
+                                    router.push('/main/stats_pa');
+                                    commit(types.LOADING, false);
+                                });
+                    } else if (result.additionalUserInfo && !result.additionalUserInfo.isNewUser) {
+                        refPlayers.where("userId", "==", user.uid).get()
                             .then(snapshot => {
                                 if (snapshot.size) {
                                     commit(types.SET_USERNAME, snapshot.docs[0].id);
-                                    return refPlayers.doc(snapshot.docs[0].id).set({
-                                        img: user.photoURL,
-                                        userId: user.uid,
-                                    }, { merge: true })
-                                } else {
-                                    return;
                                 }
+                                return refPlayers.doc(snapshot.docs[0].id).set({
+                                    img: result.additionalUserInfo.profile.picture.data.url,
+                                }, { merge: true });
                             })
                             .then(() => {
+                                // go to main page
                                 router.push('/main/stats_pa');
                                 commit(types.LOADING, false);
                             });

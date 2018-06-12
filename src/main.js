@@ -33,11 +33,11 @@ const app = new Vue({
 	i18n,
 });
 
-const version = 6;
+const version = 7;
 if (window.localStorage.getItem('version') !== version.toString()) {
 	window.localStorage.clear();
 	window.localStorage.setItem('version', version.toString());
-	window.location.href = "";
+	router.push('/login');
 }
 
 document.title = 'TrendStar';

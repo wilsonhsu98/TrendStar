@@ -6,11 +6,11 @@ const db = admin.firestore();
 const timestamp = admin.firestore.FieldValue.serverTimestamp();
 
 exports.import_game = functions.https.onRequest((req, res) => {
-	const body = req.body;
-	const game = body.game;
+    const body = req.body;
+    const game = body.game;
     const teddySummary = body.summary.find(item => item['場次'] === game);
     const parseResult = parseGame(body.rawdata);
-	db.collection('games').doc(game).set({
+    db.collection('games').doc(game).set({
             orders: parseResult.orders,
             errors: parseResult.errors,
             result: ['win', 'lose', 'tie', ''][
@@ -20,11 +20,13 @@ exports.import_game = functions.https.onRequest((req, res) => {
             season: teddySummary ? teddySummary['季度'] : '',
             opponent: teddySummary ? teddySummary['對手'] : '',
             league: teddySummary ? teddySummary['聯盟'] : '',
+            coach: teddySummary ? teddySummary['教練'] : '',
+            place: teddySummary ? teddySummary['休息區'] : '',
             group: teddySummary ? teddySummary['組別'] : '',
             timestamp,
         }).then(writeResult => {
-			res.json(writeResult);
-		});
+            res.json(writeResult);
+        });
 });
 
 const contentMapping = {

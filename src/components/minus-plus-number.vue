@@ -1,5 +1,5 @@
 <template>
-	<div style="display: inline-block;" :class="`${disabled ? 'disabled' : ''}`">
+	<div style="display: inline-block;" :class="`container ${disabled ? 'disabled' : ''}`">
 		<div class="dec button" @click="minus"></div><!--
 		--><input type="number" class="input" v-model.number="num" min="1" :disabled="disabled"><!--
 		--><div class="inc button" @click="plus"></div>
@@ -7,6 +7,10 @@
 </template>
 
 <style lang="scss" scoped>
+	.container {
+		position: relative;
+		z-index: 0;
+	}
 	.disabled {
 		.input,
 		.button {
@@ -22,10 +26,18 @@
 		border: 2px solid rgb(166, 166, 166);
 		background-color: rgb(248, 248, 248);
 		vertical-align: top;
+		border-radius: 0;
+		position: relative;
+		z-index: 1;
+		-webkit-appearance: none;
+		-moz-appearance: textfield;
+		appearance: none;
 	}
 
 	.button {
 		position: relative;
+		z-index: 0;
+		cursor: pointer;
 		width: 26px;
 		height: 26px;
 	    display: inline-block;

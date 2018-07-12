@@ -81,7 +81,7 @@
 		.gamelist-container {
 			border-radius: 0;
 			margin: 0;
-			padding: 60px 0 0;
+			padding: 10px 0 0;
 			background-color: transparent;
 			.row {
 				&:after {

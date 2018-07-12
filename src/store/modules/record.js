@@ -86,7 +86,17 @@ const getters = {
     genStatistics: state => {
         return utils.genStatistics(state.players, state.records, state.unlimitedPA ? undefined : state.top, state.period.find(item => item.select).games)
             .filter(item => item.PA !== '-' && (state.unlimitedPA || item.PA === state.top) && state.hiddenPlayer.indexOf(item.name) === -1)
-            .sort((a, b) => b[state.sortBy] - a[state.sortBy]);
+            .sort((a, b) => {
+                if (['AVG', 'OBP', 'SLG', 'OPS'].indexOf(state.sortBy) > -1) {
+                    return b[state.sortBy] === a[state.sortBy] ? b['PA'] - a['PA'] : b[state.sortBy] - a[state.sortBy];
+                } else {
+                    if (b[state.sortBy] === 0 && a[state.sortBy] === 0) {
+                        return b['PA'] - a['PA'];
+                    } else {
+                        return b[state.sortBy] === a[state.sortBy] ? a['PA'] - b['PA'] : b[state.sortBy] - a[state.sortBy];
+                    }
+                }
+            });
     },
     displayedCols: state => {
         return state.cols.filter(item => item.visible);
@@ -111,6 +121,26 @@ const getters = {
         });
     },
     gameList: state => state.gameList,
+    periodGames: state => state.period.find(item => item.select).games,
+    itemStats: state => {
+        const games = state.period.find(item => item.select).games;
+        const minimunPA = games.length * 1.6;
+        const records = utils.genStatistics(state.players, state.records, undefined, games);
+        return {
+            AVG: records.filter(item => item.PA !== '-' && item.AVG > 0 && item.PA >= minimunPA)
+                    .sort((a, b) => b['AVG'] === a['AVG'] ? b['PA'] - a['PA'] : b['AVG'] - a['AVG'])
+                    .map(item => ({ name: item.name, PA: item.PA, AVG: item.AVG.toFixed(3), data: item.data })),
+            H: records.filter(item => item.PA !== '-' && item.H > 0)
+                    .sort((a, b) => b['H'] === a['H'] ? a['PA'] - b['PA'] : b['H'] - a['H'])
+                    .map(item => ({ name: item.name, PA: item.PA, H: item.H, data: item.data })),
+            HR: records.filter(item => item.PA !== '-' && item.HR > 0)
+                    .sort((a, b) => b['HR'] === a['HR'] ? a['PA'] - b['PA'] : b['HR'] - a['HR'])
+                    .map(item => ({ name: item.name, PA: item.PA, HR: item.HR, data: item.data })),
+            RBI: records.filter(item => item.PA !== '-' && item.RBI > 0)
+                    .sort((a, b) => b['RBI'] === a['RBI'] ? a['PA'] - b['PA'] : b['RBI'] - a['RBI'])
+                    .map(item => ({ name: item.name, PA: item.PA, RBI: item.RBI, data: item.data })),
+        };
+    }
 };
 
 const actions = {

@@ -38,7 +38,7 @@
 
 	@media only screen and (max-width: 760px) {
 		.profile-container {
-			padding: 60px 0 0;
+			padding: 10px 0 0;
 		}
 	}
 </style>

@@ -40,6 +40,11 @@ const router = new VueRouter({
                     component: require('./views/view_stats_pa').default,
                     meta: { requiresAuth: true },
                 }, {
+                    path: 'stats_item',
+                    name: 'stats_item',
+                    component: require('./views/view_stats_item').default,
+                    meta: { requiresAuth: true },
+                }, {
                     path: 'user',
                     name: 'user',
                     component: require('./views/view_user').default,

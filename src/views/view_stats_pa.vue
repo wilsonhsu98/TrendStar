@@ -7,7 +7,7 @@
 				<div class="condition__label">{{ $t('col_period') }}</div>
 				<div class="condition__element">
 					<div class="selectdiv">
-						<select class="dropdown" :value="periodSelect" @change="setPeriod($event.target.value)">
+						<select class="dropdown" :value="periodSelect" @change="setPeriod_($event.target.value)">
 							<option v-for="item in period" :value="item.period">{{ `${item.period === 'period_all' ? $t(item.period) : item.period}` }}</option>
 						</select>
 					</div>
@@ -15,16 +15,16 @@
 				<div class="condition__label">{{ $t('col_sort') }}</div>
 				<div class="condition__element">
 					<div class="selectdiv">
-						<select class="dropdown" :value="sortBy" @change="setSortBy($event.target.value)">
+						<select class="dropdown" :value="sortBy" @change="setSortBy_($event.target.value)">
 							<option v-for="col in conditionCols" :value="col.name">{{ $t(col.name) }}</option>
 						</select>
 					</div>
 				</div>
 				<div class="condition__label">{{ $t('col_latest') }}</div>
 				<div class="condition__element pa">
-					<minus-plus-number :value="top" :disabled="unlimitedPA" @change="setTop"/>
+					<minus-plus-number :value="top" :disabled="unlimitedPA" @change="setTop_"/>
 					<label for="unlimited_pa"><!--
-						 --><input id="unlimited_pa" type="checkbox" :checked="unlimitedPA" @change="setUnlimitedPA($event.target.checked)"/><!--
+						 --><input id="unlimited_pa" type="checkbox" :checked="unlimitedPA" @change="setUnlimitedPA_($event.target.checked)"/><!--
 						  -->{{ $t('col_unlimited') }}<!--
 					 --></label>
 				</div>
@@ -36,7 +36,7 @@
 						 -->{{ $t('All') }}<!--
 					 --></label><!--
 					 --><label class="condition__col" :for="col.name" v-for="col in conditionCols"><!--
-						 --><input :id="col.name" type="checkbox" :value="col.name" :checked="col.visible" :disabled="col.disabled" @change="toggleColumn(col.name)"/><!--
+						 --><input :id="col.name" type="checkbox" :value="col.name" :checked="col.visible" :disabled="col.disabled" @change="toggleColumn_(col.name)"/><!--
 						 -->{{ $t(col.name) }}<!--
 					 --></label>
 				</div>
@@ -44,19 +44,23 @@
 					<div class="condition__label date">{{ $t('col_update') }}</div>
 					<div class="condition__element date" :data-long="`${$t('col_update')} `" :data-short="`${$t('col_update_short')} `">{{ new Date(lastUpdate).toLocaleString() }}</div>
 				</template>
-				<i class="fa fa-refresh" @click="refreshPlayer"></i>
+				<i class="fa fa-refresh" @click="refreshPlayer_"></i>
 			</div>
 		</div>
 		<div id="table">
 			<div class="header-row">
-				<span class="cell delete"><i class="fa fa-refresh" @click="refreshPlayer"></i></span>
-				<span :class="`cell ${col.name}`" v-for="col in displayedCols" :title="$t(col.name)"><div>{{ $t(col.name) }}</div></span>
+				<span class="cell delete"><i class="fa fa-refresh" @click="refreshPlayer_"></i></span>
+				<template v-for="col in displayedCols">
+					<span v-if="col.name === 'Rank'" class="cell Rank" :title="$t(col.name)"><div>{{ $t(col.name) }}</div></span>
+					<span v-else-if="col.name === 'name'" class="cell name" :title="$t(col.name)"><div>{{ $t(col.name) }}</div></span>
+					<span v-else :class="`cell ${col.name}${col.name === sortBy ? ' sort' : ''}`" :title="$t(col.name)" @click="setSortBy_(col.name)"><div>{{ $t(col.name) }}</div></span>
+				</template>
 			</div>
 			<template v-for="(item, index) in list">
-				<input type="radio" name="expand" class="toggle-row" @click="toggleRadio($event)"/>
+				<input type="radio" name="expand" class="toggle-row" :checked="toggleTarget ===  item.name" @click="toggleRadio(item.name)"/>
 				<div :class="`row-grid${item.name === userName ? ' current' : ''}`">
-					<span class="cell delete"><i class="fa fa-trash" @click="deletePlayer(item.name)"></i></span>
-					<template v-for="(col, cIndex) in displayedCols">
+					<span class="cell delete"><i class="fa fa-trash" @click="deletePlayer_(item.name)"></i></span>
+					<template v-for="col in displayedCols">
 						<span v-if="col.name === 'Rank'" class="cell Rank" data-label="Rank">{{ index + 1 }}</span>
 						<span v-else-if="col.name === 'name'" class="cell name" data-label="name">
 							<span>
@@ -72,7 +76,7 @@
 							{{ formatValue(item[col.name], col.name) }}
 						</span>
 					</template>
-					<div v-if="item.listByGame.length" class="cell chart" :style="{ top: `${(index + 2) * 36}px` }">
+					<div v-if="item.listByGame.length" class="cell chart" :style="{ top: `${(index + 2) * 36}px` }" :id="`row_${item.name}`">
 						<div class="chart-inner">
 							<div class="bar" v-for="cube in item.listByGame">
 								<template v-for="(cell, i) in cube">
@@ -151,6 +155,9 @@
 			background: $header_bgcolor;
 			color: $header_color;
 			.cell {
+				&:not(.Rank):not(.name) {
+					cursor: pointer;
+				}
 				> div {
 					height: 36px;
 					overflow : hidden;
@@ -198,6 +205,9 @@
 			display: table-cell;
 			line-height: 36px;
 			text-align: center;
+			&:nth-child(2n+4) {
+				opacity: 0.6;
+			}
 			&.chart {
 				background-color: #fff;
 				position: absolute;
@@ -273,6 +283,10 @@
 						}
 					}
 				}
+			}
+			&.sort {
+				opacity: 1;
+				color: $active_bgcolor;
 			}
 		}
 	}
@@ -359,7 +373,6 @@
 		#table {
 			display: block;
 			border: none;
-			margin-top: 50px;
 			overflow: hidden;
 			position: relative;
 			z-index: 0;
@@ -383,6 +396,9 @@
 					.cell.chart .game {
 						color: $current_user_color;
 					}
+				}
+				.cell:nth-child(2n+4) {
+					opacity: 1;
 				}
 			}
 			.header-row {
@@ -413,6 +429,7 @@
 				&.sort {
 					grid-area: sort;
 					text-align: center;
+					color: inherit;
 				}
 				&.delete {
 					grid-area: delete;
@@ -558,7 +575,14 @@
 </style>
 
 <script>
+	import Vue from 'vue';
 	import { mapGetters, mapActions } from 'vuex';
+	const clickEvent = (() => {
+		if ('ontouchstart' in document.documentElement === true)
+			return 'touchstart';
+		else
+			return 'click';
+	})();
 
 	export default {
 		data() {
@@ -570,10 +594,10 @@
 		created () {
 		},
 		mounted() {
-			window.addEventListener('click', this.collapseSearch, true);
+			document.addEventListener(clickEvent, this.collapseSearch, true);
 		},
 		beforeDestroy() {
-			window.removeEventListener('click', this.collapseSearch);
+			document.removeEventListener(clickEvent, this.collapseSearch);
 		},
 		methods: {
 			...mapActions([
@@ -589,12 +613,11 @@
 			formatValue(value, col) {
 				return ['AVG', 'OBP', 'SLG', 'OPS'].indexOf(col) > -1 && value !== '-' ? value.toFixed(3) : value;
 			},
-			toggleRadio(event) {
-				if (this.toggleTarget === event.target) {
-					event.target.checked = false;
+			toggleRadio(target) {
+				if (this.toggleTarget === target) {
 					this.toggleTarget = null;
 				} else {
-					this.toggleTarget = event.target;
+					this.toggleTarget = target;
 				}
 			},
 			collapseSearch(event) {
@@ -606,9 +629,38 @@
 					}
 				}
 			},
+			setPeriod_(period) {
+				this.toggleTarget = null;
+				this.setPeriod(period);
+			},
+			setTop_(top) {
+				this.toggleTarget = null;
+				this.setTop(top);
+			},
+			setUnlimitedPA_(isChecked) {
+				this.toggleTarget = null;
+				this.setUnlimitedPA(isChecked);
+			},
+			setSortBy_(sortItem) {
+				this.toggleTarget = null;
+				this.setSortBy(sortItem);
+			},
 			setCheckAll_(isCheckAll) {
+				this.toggleTarget = null;
 				this.setCheckAll(isCheckAll);
-			}
+			},
+			toggleColumn_(column) {
+				this.toggleTarget = null;
+				this.toggleColumn(column);
+			},
+			deletePlayer_(player) {
+				this.toggleTarget = null;
+				this.deletePlayer(player);
+			},
+			refreshPlayer_() {
+				this.toggleTarget = null;
+				this.refreshPlayer();
+			},
 		},
 		computed: {
 			...mapGetters({

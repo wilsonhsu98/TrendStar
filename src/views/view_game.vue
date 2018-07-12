@@ -109,7 +109,7 @@
 					}
 				}
 				.error {
-					color: $current_user_bgcolor;
+					color: #ff695e;
 				}
 			}
 			.records {
@@ -187,7 +187,6 @@
 	}
 	@media only screen and (max-width: 760px) {
 		.gamebox-container {
-			margin-top: 50px;
 			font-size: 14px;
 			.box-summary {
 				background-color: transparent;
@@ -285,6 +284,7 @@
 					.then(canvas => {
 						const formData = new FormData();
 						formData.append('image', canvas.toDataURL('image/jpeg', 1.0).split(',')[1]);
+						formData.append('album', '6jfyyD7F85VePBF');
 						return axios.post('https://api.imgur.com/3/image', formData, {
 							headers: {
 								Authorization: 'Client-ID af58b85d81d963f'

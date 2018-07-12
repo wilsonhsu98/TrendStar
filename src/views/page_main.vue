@@ -13,6 +13,11 @@
 					</router-link>
 				</li>
 				<li>
+					<router-link :to="{ name: 'stats_item' }" active-class="active" :data-label="$t('menu_stats_item')">
+						<i class="fa fa-th-large"></i>
+					</router-link>
+				</li>
+				<li>
 					<router-link :to="{ name: 'user' }" active-class="active" :data-label="$t('menu_profile')">
 						<i class="fa fa-user"></i>
 					</router-link>
@@ -94,7 +99,6 @@
 			padding-bottom: $footer_menu_height;
 		}
 		header {
-
 			height: $footer_menu_height;
 			line-height: $footer_menu_height;
 			bottom: 0;
@@ -131,7 +135,7 @@
 					background: none;
 					margin-top: -15px;
 					.fa {
-						background-color: $current_user_bgcolor;
+						background-color: $active_bgcolor;
 						border-radius: 50%;
 						width: 40px;
 						height: 40px;
@@ -146,6 +150,7 @@
 		.content {
 			width: 100%;
 			margin: 0;
+			padding-top: 50px;
 		}
 	}
 </style>
@@ -168,6 +173,11 @@
 			...mapGetters({
 				loading: 'loading',
 			})
+		},
+		watch: {
+			$route() {
+				window.scrollTo(0, 0);
+			}
 		}
 	}
 </script>

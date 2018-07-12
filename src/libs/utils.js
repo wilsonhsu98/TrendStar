@@ -1,4 +1,19 @@
 var utils = exports;
+var contentMapping = {
+    '1H': '1H',
+    '2H': '2H',
+    '3H': '3H',
+    'HR': 'HR',
+    '飛球': 'FO',
+    '滾地': 'GO',
+    'BB': 'BB',
+    'K': 'K',
+    'E': 'E',
+    '野選': 'FC',
+    '犧飛': 'SF',
+    '雙殺': 'DP',
+    '三殺': 'TP',
+};
 
 utils.genStatistics = function(players, records, filterPA, filterGames) {
     // filterPA = filterPA || 10;
@@ -142,21 +157,7 @@ utils.genStatistics = function(players, records, filterPA, filterGames) {
         return obj;
     });
 };
-var contentMapping = {
-    '1H': '1H',
-    '2H': '2H',
-    '3H': '3H',
-    'HR': 'HR',
-    '飛球': 'FO',
-    '滾地': 'GO',
-    'BB': 'BB',
-    'K': 'K',
-    'E': 'E',
-    '野選': 'FC',
-    '犧飛': 'SF',
-    '雙殺': 'DP',
-    '三殺': 'TP',
-};
+
 utils.parseGame = function(arr) {
     var nameCol = arr[0].indexOf('名單'),
         errCol = arr[0].indexOf('失誤'),

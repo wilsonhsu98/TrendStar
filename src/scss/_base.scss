@@ -6,6 +6,31 @@ body {
 	font-family: 'Inconsolata', '微軟正黑體';
 	// overflow-y: scroll;
 }
+input, textarea {
+	font-family: 'Inconsolata', '微軟正黑體';
+	margin: 0;
+	&:disabled {
+		opacity: .7;
+	}
+}
+input[type=checkbox]:not(.non-input),
+input[type=radio]:not(.non-input) {
+	vertical-align: middle;
+	position: relative;
+	bottom: 1px;
+}
+input[type=radio]:not(.non-input) {
+	bottom: 2px;
+}
+
+button {
+	color: #FFF;
+	border: none;
+	border-radius: 2px;
+	background: rgba(158,158,158,.2);
+	box-shadow: 0 2px 2px 0 rgba(0,0,0,.14), 0 3px 1px -2px rgba(0,0,0,.2), 0 1px 5px 0 rgba(0,0,0,.12);
+	cursor: pointer;
+}
 
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
@@ -38,6 +63,7 @@ select::-ms-expand {
 
 .selectdiv {
 	position: relative;
+	display: inline-block;
 }
 
 .selectdiv:after {
@@ -77,5 +103,7 @@ select::-ms-expand {
 
 
 @media only screen and (max-width: 760px) {
-
+	// html {
+	// 	background-color: #fff;
+	// }
 }

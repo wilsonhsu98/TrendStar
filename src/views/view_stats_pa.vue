@@ -2,49 +2,51 @@
 	<div>
 		<div class="search-bar" ref="searchBar">
 			<div class="search-bar__container"><i class="fa fa-search"></i></div>
-			<input type="checkbox" class="toggle-search" v-model="toggleSearch"/>
-			<div class="condition">
-				<div class="condition__label">{{ $t('col_period') }}</div>
-				<div class="condition__element">
-					<div class="selectdiv">
-						<select class="dropdown" :value="periodSelect" @change="setPeriod_($event.target.value)">
-							<option v-for="item in period" :value="item.period">{{ `${item.period === 'period_all' ? $t(item.period) : item.period}` }}</option>
-						</select>
+			<input type="checkbox" class="toggle-search non-input" v-model="toggleSearch"/>
+			<div class="condition__container">
+				<div class="condition">
+					<div class="condition__label">{{ $t('col_period') }}</div>
+					<div class="condition__element">
+						<div class="selectdiv">
+							<select class="dropdown" :value="periodSelect" @change="setPeriod_($event.target.value)">
+								<option v-for="item in period" :value="item.period">{{ `${item.period === 'period_all' ? $t(item.period) : item.period}` }}</option>
+							</select>
+						</div>
 					</div>
-				</div>
-				<div class="condition__label">{{ $t('col_sort') }}</div>
-				<div class="condition__element">
-					<div class="selectdiv">
-						<select class="dropdown" :value="sortBy" @change="setSortBy_($event.target.value)">
-							<option v-for="col in conditionCols" :value="col.name">{{ $t(col.name) }}</option>
-						</select>
+					<div class="condition__label">{{ $t('col_sort') }}</div>
+					<div class="condition__element">
+						<div class="selectdiv">
+							<select class="dropdown" :value="sortBy" @change="setSortBy_($event.target.value)">
+								<option v-for="col in conditionCols" :value="col.name">{{ $t(col.name) }}</option>
+							</select>
+						</div>
 					</div>
+					<div class="condition__label">{{ $t('col_latest') }}</div>
+					<div class="condition__element pa">
+						<minus-plus-number :value="top" :disabled="unlimitedPA" @change="setTop_"/>
+						<label for="unlimited_pa"><!--
+							 --><input id="unlimited_pa" type="checkbox" :checked="unlimitedPA" @change="setUnlimitedPA_($event.target.checked)"/><!--
+							  -->{{ $t('col_unlimited') }}<!--
+						 --></label>
+					</div>
+					<br>
+					<div class="condition__label col">{{ $t('col_display') }}</div>
+					<div class="condition__element col">
+						<label class="condition__col" for="check_all"><!--
+							 --><input id="check_all" type="checkbox" :checked="checkAll" @change="setCheckAll_($event.target.checked)"/><!--
+							 -->{{ $t('All') }}<!--
+						 --></label><!--
+						 --><label class="condition__col" :for="col.name" v-for="col in conditionCols"><!--
+							 --><input :id="col.name" type="checkbox" :value="col.name" :checked="col.visible" :disabled="col.disabled" @change="toggleColumn_(col.name)"/><!--
+							 -->{{ $t(col.name) }}<!--
+						 --></label>
+					</div>
+					<template v-if="lastUpdate">
+						<div class="condition__label date">{{ $t('col_update') }}</div>
+						<div class="condition__element date" :data-long="`${$t('col_update')} `" :data-short="`${$t('col_update_short')} `">{{ new Date(lastUpdate).toLocaleString() }}</div>
+					</template>
+					<i class="fa fa-refresh" @click="refreshPlayer_"></i>
 				</div>
-				<div class="condition__label">{{ $t('col_latest') }}</div>
-				<div class="condition__element pa">
-					<minus-plus-number :value="top" :disabled="unlimitedPA" @change="setTop_"/>
-					<label for="unlimited_pa"><!--
-						 --><input id="unlimited_pa" type="checkbox" :checked="unlimitedPA" @change="setUnlimitedPA_($event.target.checked)"/><!--
-						  -->{{ $t('col_unlimited') }}<!--
-					 --></label>
-				</div>
-				<br>
-				<div class="condition__label col">{{ $t('col_display') }}</div>
-				<div class="condition__element col">
-					<label class="condition__col" for="check_all"><!--
-						 --><input id="check_all" type="checkbox" :checked="checkAll" @change="setCheckAll_($event.target.checked)"/><!--
-						 -->{{ $t('All') }}<!--
-					 --></label><!--
-					 --><label class="condition__col" :for="col.name" v-for="col in conditionCols"><!--
-						 --><input :id="col.name" type="checkbox" :value="col.name" :checked="col.visible" :disabled="col.disabled" @change="toggleColumn_(col.name)"/><!--
-						 -->{{ $t(col.name) }}<!--
-					 --></label>
-				</div>
-				<template v-if="lastUpdate">
-					<div class="condition__label date">{{ $t('col_update') }}</div>
-					<div class="condition__element date" :data-long="`${$t('col_update')} `" :data-short="`${$t('col_update_short')} `">{{ new Date(lastUpdate).toLocaleString() }}</div>
-				</template>
-				<i class="fa fa-refresh" @click="refreshPlayer_"></i>
 			</div>
 		</div>
 		<div id="table">
@@ -57,7 +59,7 @@
 				</template>
 			</div>
 			<template v-for="(item, index) in list">
-				<input type="radio" name="expand" class="toggle-row" :checked="toggleTarget ===  item.name" @click="toggleRadio(item.name)"/>
+				<input type="radio" name="expand" class="toggle-row non-input" :checked="toggleTarget ===  item.name" @click="toggleRadio(item.name)"/>
 				<div :class="`row-grid${item.name === userName ? ' current' : ''}`">
 					<span class="cell delete"><i class="fa fa-trash" @click="deletePlayer_(item.name)"></i></span>
 					<template v-for="col in displayedCols">
@@ -125,6 +127,7 @@
 		&__col {
 			margin-right: 10px;
 			vertical-align: middle;
+			text-align: left;
 		}
 	}
 
@@ -325,7 +328,7 @@
 				margin: 0;
 				opacity: 0;
 				&:checked {
-					&~.condition {
+					&~.condition__container {
 						max-height: 200vh;
 						transition-timing-function: cubic-bezier(0.5, 0, 1, 0);
 						transition-delay: 0s;
@@ -336,26 +339,45 @@
 					}
 				}
 			}
+			.condition__container {
+				display: block;
+				max-height: 0;
+				transition: max-height .5s cubic-bezier(0, 1, 0, 1) -.1s;
+			}
 			.condition {
 				background-color: transparent;
 				border-radius: 0;
 				margin: 0;
-				max-height: 0;
-				transition: max-height .5s cubic-bezier(0, 1, 0, 1) -.1s;
-				display: grid;
-				grid-template-rows: auto;
-				grid-column-gap: 3px;
-				grid-row-gap: 6px;
-				align-items: center;
-				justify-items: start;
-				padding: 0 3px;
+				display: flex;
+				flex-wrap: wrap;
+				padding: 3px;
 				box-sizing: border-box;
 				position: relative;
 				> br {
 					display: none;
 				}
 				&__col {
-					margin: 0;
+					margin: 0 9px 3px 0;
+				}
+				&__label {
+					text-align: right;
+					margin: 0 3px 6px 0;
+					&.date {
+						display: none;
+					}
+				}
+				&__element {
+					text-align: left;
+					margin: 0 3px 6px 0;
+					&.date {
+						width: 100vw;
+						text-align: right;
+						padding: 0 10px 10px 0;
+						margin: 0;
+						&:before {
+							content: attr(data-long);
+						}
+					}
 				}
 				.fa {
 					opacity: 0;
@@ -379,8 +401,9 @@
 
 			.row-grid {
 				position: relative;
-				display: grid;
-				grid-template-rows: auto;
+				display: flex;
+				flex-wrap: wrap;
+
 				z-index: 0;
 				background-color: #FFF;
 				transition: max-height 1s cubic-bezier(0, 1, 0, 1) -.1s;
@@ -405,10 +428,10 @@
 				display: none;
 			}
 			.cell {
+				order: 6;
 				display: block;
 				box-sizing: border-box;
 				&:not(.sort):not(.Rank):not(.name):not(.delete):not(.chart) {
-					grid-column: auto / span 2;
 					text-align: left;
 				}
 				&:not(.Rank):not(.name):not(.delete):not(.chart) {
@@ -420,29 +443,22 @@
 						margin-right: -6px;
 					}
 				}
-				&.Rank {
-					grid-area: rank;
-				}
-				&.name {
-					grid-area: name;
-				}
+				&.Rank { order: 1; }
+				&.name { order: 2; }
 				&.sort {
-					grid-area: sort;
+					order: 3;
 					text-align: center;
 					color: inherit;
 				}
-				&.delete {
-					grid-area: delete;
-				}
+				&.delete { order: 4; }
 				&.chart {
-					grid-area: chart;
+					order: 5;
 					position: initial;
-					margin-top: 0;
+					margin: 0;
 					border: none;
 					box-shadow: none;
 					background-color: transparent;
 					display: flex;
-					width: 100%;
 				}
 			}
 			.toggle-row {
@@ -461,9 +477,14 @@
 	@media only screen and (max-width: 760px) and (max-aspect-ratio: 13/9) {
 		#table {
 			.row-grid {
-				grid-template-columns: repeat(6, 1fr);
-				grid-template-areas: "rank name name sort sort delete"
-									"chart chart chart chart chart chart";
+				.cell {
+					width: 33vw;
+					&.Rank   { width: 17vw; }
+					&.name   { width: 33vw; }
+					&.sort   { width: 33vw; }
+					&.delete { width: 17vw; }
+					&.chart  { width: 100vw; }
+				}
 			}
 			.toggle-row {
 				width: calc(100% / 6 * 5);
@@ -471,44 +492,34 @@
 		}
 		.search-bar {
 			.condition {
-				grid-template-columns: repeat(6, 1fr);
 				&__label {
-					grid-column: auto / span 2;
-					justify-self: end;
-					&.col {
-						align-self: start;
-					}
+					width: 31vw;
 					&.date {
 						display: none;
 					}
 				}
 				&__element {
-					grid-column: auto / span 4;
+					width: 62vw;
 					&.col {
 						height: auto;
-						width: auto;
-						display: grid;
-						grid-template-columns: repeat(4, 1fr);
-						grid-column-gap: 8px;
-						grid-row-gap: 3px;
-						align-items: center;
-						justify-items: start;
+						width: 62vw;
+						display: flex;
+						flex-wrap: wrap;
 						margin-bottom: 4px;
 					}
 					&.date {
-						grid-column: auto / span 6;
-						justify-self: end;
-						padding: 0 10px 10px 0;
 						&:before {
-							content: attr(data-short)
+							content: attr(data-short);
 						}
 					}
+				}
+				&__col {
+					width: 28%;
 				}
 			}
 		}
 		[lang=zh-TW] {
 			.search-bar .condition__element.col {
-				grid-template-columns: repeat(3, 1fr);
 				font-size: 14px;
 			}
 		}
@@ -516,9 +527,14 @@
 	@media only screen and (max-width: 760px) and (min-aspect-ratio: 13/9) {
 		#table {
 			.row-grid {
-				grid-template-columns: repeat(10, 1fr);
-				grid-template-areas: "rank name name sort sort sort sort sort sort delete"
-									"chart chart chart chart chart chart chart chart chart chart";
+				.cell {
+					width: 20vw;
+					&.Rank   { width: 10vw; }
+					&.name   { width: 20vw; }
+					&.sort   { width: 60vw; }
+					&.delete { width: 10vw; }
+					&.chart  { width: 100vw; }
+				}
 			}
 			.toggle-row {
 				width: calc(100% / 10 * 9);
@@ -526,48 +542,32 @@
 		}
 		.search-bar {
 			.condition {
-				grid-template-columns: repeat(10, 1fr);
 				&__label {
-					grid-column: auto / span 2;
-					justify-self: end;
-					&.col {
-						align-self: start;
-					}
+					width: 18vw;
 					&.date {
 						visibility: hidden;
 					}
 				}
 				&__element {
-					grid-column: auto / span 3;
+					width: 29vw;
 					&.pa {
-						grid-column: auto / span 8;
+						width: 78vw;
 					}
 					&.col {
-						grid-column: auto / span 8;
 						height: auto;
-						width: auto;
-						display: grid;
-						grid-template-columns: repeat(8, 1fr);
-						grid-column-gap: 10px;
-						grid-row-gap: 3px;
-						align-items: center;
-						justify-items: start;
-						margin-bottom: 4px;
+						width: 78vw;
+						display: flex;
+						flex-wrap: wrap;
+						margin: 0 0 0 2px;
 					}
-					&.date {
-						grid-column: auto / span 8;
-						justify-self: end;
-						padding: 0 10px 10px 0;
-						&:before {
-							content: attr(data-long);
-						}
-					}
+				}
+				&__col {
+					width: 12%;
 				}
 			}
 		}
 		[lang=zh-TW] {
 			.search-bar .condition__element.col {
-				grid-template-columns: repeat(7, 1fr);
 				font-size: 12px;
 			}
 		}

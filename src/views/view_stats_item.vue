@@ -2,21 +2,23 @@
 	<div>
 		<div class="search-bar" ref="searchBar">
 			<div class="search-bar__container"><i class="fa fa-search"></i></div>
-			<input type="checkbox" class="toggle-search" v-model="toggleSearch"/>
-			<div class="condition">
-				<div class="condition__label">{{ $t('col_period') }}</div>
-				<div class="condition__element">
-					<div class="selectdiv">
-						<select class="dropdown" :value="periodSelect" @change="setPeriod_($event.target.value)">
-							<option v-for="item in period" :value="item.period">{{ `${item.period === 'period_all' ? $t(item.period) : item.period}` }}</option>
-						</select>
+			<input type="checkbox" class="toggle-search non-input" v-model="toggleSearch"/>
+			<div class="condition__container">
+				<div class="condition">
+					<div class="condition__label">{{ $t('col_period') }}</div>
+					<div class="condition__element">
+						<div class="selectdiv">
+							<select class="dropdown" :value="periodSelect" @change="setPeriod_($event.target.value)">
+								<option v-for="item in period" :value="item.period">{{ `${item.period === 'period_all' ? $t(item.period) : item.period}` }}</option>
+							</select>
+						</div>
 					</div>
+					<template v-if="lastUpdate">
+						<br>
+						<div class="condition__label date">{{ $t('col_update') }}</div>
+						<div class="condition__element date" :data-long="`${$t('col_update')} `" :data-short="`${$t('col_update_short')} `">{{ new Date(lastUpdate).toLocaleString() }}</div>
+					</template>
 				</div>
-				<template v-if="lastUpdate">
-					<br>
-					<div class="condition__label date">{{ $t('col_update') }}</div>
-					<div class="condition__element date" :data-long="`${$t('col_update')} `" :data-short="`${$t('col_update_short')} `">{{ new Date(lastUpdate).toLocaleString() }}</div>
-				</template>
 			</div>
 		</div>
 		<div class="item-container">
@@ -61,20 +63,6 @@
 		}
 		&__label {
 			padding: 0 4px;
-			text-align: left;
-			&.col {
-				vertical-align: top;
-			}
-		}
-		&__element {
-			&.col {
-				width: calc(100% - 90px);
-				height: auto;
-			}
-		}
-		&__col {
-			margin-right: 10px;
-			vertical-align: middle;
 		}
 	}
 
@@ -97,12 +85,11 @@
 	}
 
 	.item-container {
-		display: grid;
-		grid-template-columns: repeat(4, 1fr);
-		grid-template-rows: auto;
-		grid-column-gap: 20px;
-		grid-row-gap: 20px;
+		display: flex;
+		margin: 0 -10px;
 		.item-container__table {
+			flex: 1;
+			margin: 0 10px;
 			background-color: #fff;
 			display: flex;
 			flex-direction: column;
@@ -160,8 +147,6 @@
 				padding: 10px;
 				background-color: $row_even_bgcolor;
 				margin-top: auto;
-				// display: flex;
-				// align-items: center;
 				font-size: 10px;
 			}
 		}
@@ -196,7 +181,7 @@
 				margin: 0;
 				opacity: 0;
 				&:checked {
-					&~.condition {
+					&~.condition__container {
 						max-height: 200vh;
 						transition-timing-function: cubic-bezier(0.5, 0, 1, 0);
 						transition-delay: 0s;
@@ -207,26 +192,22 @@
 					}
 				}
 			}
+			.condition__container {
+				display: block;
+				max-height: 0;
+				transition: max-height .5s cubic-bezier(0, 1, 0, 1) -.1s;
+			}
 			.condition {
 				background-color: transparent;
 				border-radius: 0;
 				margin: 0;
-				max-height: 0;
-				transition: max-height .5s cubic-bezier(0, 1, 0, 1) -.1s;
-				display: grid;
-				grid-template-rows: auto;
-				grid-column-gap: 3px;
-				grid-row-gap: 6px;
-				align-items: center;
-				justify-items: start;
-				padding: 0 3px;
+				display: flex;
+				flex-wrap: wrap;
+				padding: 3px;
 				box-sizing: border-box;
 				position: relative;
 				> br {
 					display: none;
-				}
-				&__col {
-					margin: 0;
 				}
 				.fa {
 					opacity: 0;
@@ -234,51 +215,48 @@
 					display: inline-block;
 					color: $header_color;
 				}
-				.fa-refresh {
-					position: absolute;
-					bottom: 10px;
-					left: 12px;
-				}
-			}
-		}
-		.item-container {
-			margin: 20px 0;
-			grid-template-columns: repeat(2, 1fr);
-		}
-	}
-	@media only screen and (max-width: 760px) and (max-aspect-ratio: 13/9) {
-		.search-bar {
-			.condition {
-				grid-template-columns: repeat(6, 1fr);
 				&__label {
-					grid-column: auto / span 2;
-					justify-self: end;
-					&.col {
-						align-self: start;
-					}
+					text-align: right;
+					margin: 0 3px 6px 0;
 					&.date {
 						display: none;
 					}
 				}
 				&__element {
-					grid-column: auto / span 4;
-					&.col {
-						height: auto;
-						width: auto;
-						display: grid;
-						grid-template-columns: repeat(4, 1fr);
-						grid-column-gap: 8px;
-						grid-row-gap: 3px;
-						align-items: center;
-						justify-items: start;
-						margin-bottom: 4px;
-					}
+					text-align: left;
+					margin: 0 3px 6px 0;
 					&.date {
-						grid-column: auto / span 6;
-						justify-self: end;
+						width: 100vw;
+						text-align: right;
 						padding: 0 10px 10px 0;
+						margin: 0;
 						&:before {
-							content: attr(data-short)
+							content: attr(data-long);
+						}
+					}
+				}
+			}
+		}
+		.item-container {
+			margin: 10px 0;
+			flex-wrap: wrap;
+			justify-content: space-between;
+			.item-container__table {
+				margin: 10px 0;
+				flex: 0 1 calc(50vw - 10px);
+			}
+		}
+	}
+	@media only screen and (max-width: 760px) and (max-aspect-ratio: 13/9) {
+		.search-bar {
+			.condition {
+				&__label {
+					width: 33vw;
+				}
+				&__element {
+					&.date {
+						&:before {
+							content: attr(data-short);
 						}
 					}
 				}
@@ -288,42 +266,11 @@
 	@media only screen and (max-width: 760px) and (min-aspect-ratio: 13/9) {
 		.search-bar {
 			.condition {
-				grid-template-columns: repeat(10, 1fr);
 				&__label {
-					grid-column: auto / span 2;
-					justify-self: end;
-					&.col {
-						align-self: start;
-					}
-					&.date {
-						visibility: hidden;
-					}
+					width: 20vw;
 				}
 				&__element {
-					grid-column: auto / span 3;
-					&.pa {
-						grid-column: auto / span 8;
-					}
-					&.col {
-						grid-column: auto / span 8;
-						height: auto;
-						width: auto;
-						display: grid;
-						grid-template-columns: repeat(8, 1fr);
-						grid-column-gap: 10px;
-						grid-row-gap: 3px;
-						align-items: center;
-						justify-items: start;
-						margin-bottom: 4px;
-					}
-					&.date {
-						grid-column: auto / span 8;
-						justify-self: end;
-						padding: 0 10px 10px 0;
-						&:before {
-							content: attr(data-long);
-						}
-					}
+					width: 30vw;
 				}
 			}
 		}

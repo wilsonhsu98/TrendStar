@@ -243,6 +243,7 @@
 			justify-content: space-between;
 			.item-container__table {
 				margin: 10px 0;
+				flex: 0 1 48%;
 				flex: 0 1 calc(50vw - 10px);
 			}
 		}

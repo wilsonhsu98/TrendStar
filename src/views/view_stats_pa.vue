@@ -357,7 +357,7 @@
 					display: none;
 				}
 				&__col {
-					margin: 0 9px 3px 0;
+					margin: 0 8px 3px 0;
 				}
 				&__label {
 					text-align: right;
@@ -440,7 +440,7 @@
 						display: inline-block;
 						width: 58px;
 						text-align: right;
-						margin-right: -6px;
+						margin-right: -2px;
 					}
 				}
 				&.Rank { order: 1; }
@@ -478,12 +478,12 @@
 		#table {
 			.row-grid {
 				.cell {
-					width: 33vw;
-					&.Rank   { width: 17vw; }
-					&.name   { width: 33vw; }
-					&.sort   { width: 33vw; }
-					&.delete { width: 17vw; }
-					&.chart  { width: 100vw; }
+					width: 33%;
+					&.Rank   { width: 17%; }
+					&.name   { width: 33%; }
+					&.sort   { width: 33%; }
+					&.delete { width: 17%; }
+					&.chart  { width: 100%; }
 				}
 			}
 			.toggle-row {
@@ -514,7 +514,7 @@
 					}
 				}
 				&__col {
-					width: 28%;
+					width: 29%;
 				}
 			}
 		}
@@ -528,12 +528,12 @@
 		#table {
 			.row-grid {
 				.cell {
-					width: 20vw;
-					&.Rank   { width: 10vw; }
-					&.name   { width: 20vw; }
-					&.sort   { width: 60vw; }
-					&.delete { width: 10vw; }
-					&.chart  { width: 100vw; }
+					width: 20%;
+					&.Rank   { width: 10%; }
+					&.name   { width: 20%; }
+					&.sort   { width: 60%; }
+					&.delete { width: 10%; }
+					&.chart  { width: 100%; }
 				}
 			}
 			.toggle-row {

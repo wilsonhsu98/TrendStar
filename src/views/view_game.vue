@@ -203,7 +203,7 @@
 			}
 			.player-records {
 				.player {
-					flex-basis: 128px;
+					flex-basis: 130px;
 					.order {
 						width: 20px;
 						padding-right: 4px;

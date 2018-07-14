@@ -231,6 +231,7 @@
 					align-items: flex-end;
 					width: 100%;
 					overflow-x: auto;
+					overflow-y: hidden;
 				}
 				.bar {
 					flex-grow: 1;

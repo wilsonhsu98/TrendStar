@@ -19,7 +19,6 @@
 	}
 	.input {
 		width: 44px;
-		padding: 3px 0 0 0;
 		text-align: center;
 		height: 30px;
 		box-sizing: border-box;

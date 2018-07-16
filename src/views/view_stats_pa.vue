@@ -217,6 +217,9 @@
 				left: 190px;
 				right: 0;
 				z-index: 2;
+				overflow-x: auto;
+				overflow-y: hidden;
+				direction: rtl;
 
 				display: none;
 
@@ -227,11 +230,7 @@
 				box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 				.chart-inner {
 					display: flex;
-					direction: rtl;
 					align-items: flex-end;
-					width: 100%;
-					overflow-x: auto;
-					overflow-y: hidden;
 				}
 				.bar {
 					flex-grow: 1;

@@ -118,6 +118,7 @@ const getters = {
             result: boxSummary.result,
             h: game.filter(item => ['1H', '2H', '3H', 'HR'].indexOf(item.content) > -1).length,
             r: game.filter(item => item.r).length,
+            e: boxSummary.errors.reduce((result, item) => result + item.count, 0),
         });
     },
     gameList: state => state.gameList,

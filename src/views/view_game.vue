@@ -7,35 +7,43 @@
 				<template v-if="boxSummary.year && boxSummary.season">
 					{{ `(${boxSummary.year} ${boxSummary.season}) ${boxSummary.game}` }}
 				</template>
-				<div>{{ boxSummary.opponent ? $t('box_opponent', { opponent: boxSummary.opponent }) : $t('box_forgot_opponent') }}</div>
-				<div class="result" v-if="boxSummary.result">{{ $t('box_summary', { h: boxSummary.h, r: boxSummary.r, result: $t(`box_${boxSummary.result}`)}) }}</div>
+				<div>{{ boxSummary.opponent ? $t('box_opponent', { opponent: boxSummary.opponent }) : $t('box_forgot_opponent') }}
+				</div>
+				<div class="result" v-if="boxSummary.result">{{ $t('box_summary', { h: boxSummary.h, r: boxSummary.r, result: $t(`box_${boxSummary.result}`)}) }}
+				</div>
 			</div>
-			<div class="player-records" v-for="item in box">
-				<div class="player">
-					<span class="order">{{ item.altOrder ? $t('PH'): item.order }}</span><!--
-					 --><span class="name">
+			<div class="box-table">
+				<div class="player-records" v-for="item in box">
+					<div class="player">
+						<span class="order">{{ item.altOrder ? $t('PH'): item.order }}</span>
+						<span class="name">
 							<span class="img" style="border-width: 1px">
 								<i class="fa fa-user-o"></i>
 							</span>
 							<span v-if="item.data.img" class="img" :style="`background-image: url(${item.data.img})`">
 							</span>
 							{{ item.name }}
-						</span><!--
-					 --><span class="error">{{ item.error > 0 ? `${item.error}E` : '' }}</span>
-				</div><!--
-				 --><div class="records">
-						<template v-for="record in item.content">
-							<div class="record" v-if="record === undefined"></div>
-							<div class="record" v-else>
-								<span class="inn">{{ record.innChange }}</span><!--
-								 --><span :class="`content ${record.color} ${record.rbi ? 'rbi' : ''} ${record.r === record.name ? 'run' : ''}`" :data-rbi="record.rbi" :data-run="`${record.r === record.name ? 'R' : ''}`">{{ $t(record.content) }}</span>
-							</div>
-						</template>
+						</span>
 					</div>
-				<span class="summary">{{ item.summary }}</span>
+					<div v-if="boxSummary.e" class="error">{{ item.error > 0 ? `${item.error}E` : '' }}</div>
+					<div class="records">
+						<div class="records-flex">
+							<template v-for="record in item.content">
+								<div class="record" v-if="record === undefined"></div>
+								<div class="record" v-else>
+									<span class="inn">{{ record.innChange }}</span>
+									<span :class="`content ${record.color} ${record.rbi ? 'rbi' : ''} ${record.r === record.name ? 'run' : ''}`" :data-rbi="record.rbi" :data-run="`${record.r === record.name ? 'R' : ''}`">
+										{{ $t(record.content) }}
+									</span>
+								</div>
+							</template>
+						</div>
+					</div>
+					<span class="summary">{{ item.summary }}</span>
+				</div>
 			</div>
 		</div>
-		<div style="text-align:center; margin: 10px;">
+		<div style="text-align: center; margin: 10px;">
 			<button class="share-btn" @click="screenshot">
 				<i class="fa fa-facebook-square"></i>
 				{{ $t('fb_share') }}
@@ -62,6 +70,10 @@
 				font-size: 30px;
 			}
 		}
+		.box-table {
+			display: table;
+			width: 100%;
+		}
 		span {
 			display: inline-block;
 			text-align: center;
@@ -70,12 +82,13 @@
 			height: 36px;
 			line-height: 36px;
 			color: $row_color;
-			display: flex;
-			&:nth-child(odd) { background-color: $row_even_bgcolor; }
-			&:nth-child(even) { background-color: $row_odd_bgcolor; }
+			display: table-row;
+			&:nth-child(even) { background-color: $row_even_bgcolor; }
+			&:nth-child(odd) { background-color: $row_odd_bgcolor; }
 			.player {
-				display: inline-block;
-				width: 160px;
+				display: table-cell;
+				white-space: nowrap;
+				width: 1px;
 				.order {
 					text-align: right;
 					width: 30px;
@@ -87,7 +100,10 @@
 					line-height: 36px;
 					box-sizing: border-box;
 					position: relative;
-					width: 100px;
+					white-space: nowrap;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					vertical-align: top;
 					.img {
 						display: inline-block;
 						width: 32px;
@@ -108,15 +124,26 @@
 						}
 					}
 				}
-				.error {
-					color: #ff695e;
-				}
+			}
+			.error {
+				color: #ff695e;
+				display: table-cell;
+				white-space: nowrap;
+				width: 20px;
+				text-align: center;
 			}
 			.records {
-				flex: 1;
+				display: table-cell;
+				vertical-align: middle;
+				&-flex {
+					display: flex;
+					align-items: center;
+					width: 100%;
+				}
 				.record {
 					width: 80px;
-					display: inline-block;
+					display: flex;
+					align-items: center;
 					text-align: left;
 					.inn {
 						width: 20px;
@@ -125,6 +152,7 @@
 						width: 60px;
 						color: #fff;
 						line-height: 34px;
+						height: 34px;
 						position: relative;
 						&.red { background-color: #ef1010; }
 						&.yellow { background-color: #efaf34; }
@@ -160,7 +188,10 @@
 				}
 			}
 			.summary {
+				display: table-cell;
 				padding-right: 20px;
+				white-space: nowrap;
+				width: 1px;
 			}
 		}
 
@@ -203,21 +234,18 @@
 			}
 			.player-records {
 				.player {
-					flex-basis: 130px;
 					.order {
 						width: 20px;
 						padding-right: 4px;
 					}
 					.name {
-						width: 90px;
+						max-width: 113px;
 					}
 				}
 				.records {
-					display: flex;
 					.record {
 						width: auto;
 						flex: 1;
-						display: flex;
 						.inn {
 							width: 10px;
 						}
@@ -239,11 +267,10 @@
 					}
 				}
 				.summary {
-					flex-basis: 26px;
+					width: 26px;
 					padding: 0 5px;
 				}
 			}
-
 		}
 	}
 </style>

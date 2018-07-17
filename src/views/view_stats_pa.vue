@@ -231,6 +231,7 @@
 				.chart-inner {
 					display: flex;
 					align-items: flex-end;
+					width: 100%;
 				}
 				.bar {
 					flex-grow: 1;

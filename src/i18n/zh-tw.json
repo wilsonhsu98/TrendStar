@@ -1,5 +1,6 @@
 {
 	"login_btn": "使用FB帳號登入",
+	"login_anonymous_btn": "暱名登入",
 	"logout_btn": "登出",
 	"fb_share": "分享",
 	"menu_games": "盒子",

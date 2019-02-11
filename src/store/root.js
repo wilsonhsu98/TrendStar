@@ -31,9 +31,23 @@ const actions = {
     fbLogin({ commit }) {
         auth.signInWithRedirect(provider);
     },
+    anonymousLogin({ commit }) {
+        commit(types.LOADING, { img: true });
+        auth.signInAnonymously();
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                commit(types.SET_TOKEN, user.refreshToken);
+                commit(types.SET_USERNAME, user.uid);
+                // go to main page
+                router.push('/main/stats_pa');
+                commit(types.LOADING, false);
+            }
+        });
+    },
     chkLoginStatus({ commit }) {
         commit(types.LOADING, { img: true });
-        auth.getRedirectResult().then(result => {
+        auth.getRedirectResult()
+            .then(result => {
                 const user = auth.currentUser;
                 if (user) {
                     const refPlayers = db.collection("players");
@@ -90,8 +104,8 @@ const actions = {
                             });
                     }
                 } else {
-                    // wait for signin
-                    commit(types.CLEAN_TOKEN);
+                    // // wait for signin
+                    // commit(types.CLEAN_TOKEN);
                     commit(types.LOADING, false);
                 }
             })
@@ -103,7 +117,8 @@ const actions = {
             });
     },
     fbLogout({ commit }) {
-        auth.signOut().then(() => {
+        auth.signOut()
+            .then(() => {
                 console.log('logout');
                 commit(types.CLEAN_TOKEN);
             })
@@ -131,10 +146,12 @@ const mutations = {
         state.userName = userName;
     },
     [types.CLEAN_TOKEN](state) {
+        const version = window.localStorage.getItem('version');
         window.localStorage.clear();
         state.token = '';
         state.userId = '';
         router.push('/login');
+        window.localStorage.setItem('version', version);
     },
 };
 

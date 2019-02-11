@@ -17,10 +17,13 @@
 						<i class="fa fa-th-large"></i>
 					</router-link>
 				</li>
-				<li>
+				<li data-label="account">
 					<router-link :to="{ name: 'user' }" active-class="active" :data-label="$t('menu_profile')">
 						<i class="fa fa-user"></i>
 					</router-link>
+				</li>
+				<li style="margin-left: auto;">
+					<a @click="fbLogout">{{ $t('logout_btn') }}</a>
 				</li>
 			</ul>
 		</header>
@@ -51,6 +54,7 @@
 		height: $header_menu_height;
 		box-shadow: 0 2px 12px 0 rgba(0,0,0,.13), 0 0 2px 0 rgba(0,0,0,.2);
 		.tab {
+			display: flex;
 			box-sizing: border-box;
 			list-style-type: none;
 			padding: 0;
@@ -63,6 +67,9 @@
 			line-height: 70px;
 			> li {
 				display: inline-block;
+				&[data-label=account] {
+					display: none;
+				}
 			}
 		}
 		a {
@@ -71,6 +78,7 @@
 			padding: 8px 15px;
 			margin: 0 2px;
 			border-radius: 98px;
+			cursor: pointer;
 			&.active {
 				background-color: $row_odd_bgcolor;
 				color: $row_color;
@@ -104,7 +112,6 @@
 			bottom: 0;
 			top: initial;
 			.tab {
-				display: flex;
 				justify-content:space-around;
 				align-items: start;
 				font-size: 25px;
@@ -112,6 +119,14 @@
 				background: none;
 				margin: 0;
 				width: 100%;
+				> li {
+					&[data-label=account] {
+						display: inline-block;
+					}
+					&:last-child {
+						display: none;
+					}
+				}
 				a {
 					display: inline-block;
 					text-align: center;
@@ -167,6 +182,7 @@
 			...mapActions({
 				initFromLS: 'initFromLS',
 				fetchTable: 'fetchTable',
+				fbLogout: 'fbLogout',
 			})
 		},
 		computed: {

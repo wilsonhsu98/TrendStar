@@ -58,9 +58,9 @@
 					<span v-else :class="`cell ${col.name}${col.name === sortBy ? ' sort' : ''}`" :title="$t(col.name)" @click="setSortBy_(col.name)"><div>{{ $t(col.name) }}</div></span>
 				</template>
 			</div>
-			<template v-for="(item, index) in list">
-				<input type="radio" name="expand" class="toggle-row non-input" :checked="toggleTarget ===  item.name" @click="toggleRadio(item.name)"/>
-				<div :class="`row-grid${item.name === userName ? ' current' : ''}`">
+			<template v-for="(item, index) in list" >
+				<input type="radio" name="expand" class="toggle-row non-input" :checked="toggleTarget ===  item.name" @click="toggleRadio(item.name)" :key="`chk_${encodeURI(item.name)}`"/>
+				<div :class="`row-grid${item.name === userName ? ' current' : ''}`" :key="`div_${encodeURI(item.name)}`">
 					<span class="cell delete"><i class="fa fa-trash" @click="deletePlayer_(item.name)"></i></span>
 					<template v-for="col in displayedCols">
 						<span v-if="col.name === 'Rank'" class="cell Rank" data-label="Rank">{{ index + 1 }}</span>
